@@ -25,10 +25,10 @@ export default function Hero({
       style={{ backgroundImage: `url(${imageUrl})` }}
       aria-label={altText}
     >
-      <div className="absolute inset-0 bg-black opacity-20"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-[--brand]/20 to-transparent z-10"></div>
 
       {/* Contenedor principal para ambos logos, apilados verticalmente */}
-      <div className="relative z-10 flex flex-col items-center transform -translate-y-24">
+      <div className="relative z-20 flex flex-col items-center -translate-y-24">
         {sealLogoUrl && sealLogoAltText && (
           <div className="p-2 bg-none bg-opacity-10 rounded-full shadow-xl">
             <Image
