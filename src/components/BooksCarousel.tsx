@@ -2,40 +2,22 @@
 
 import { useRef, useEffect } from "react";
 import BookCard from "./BookCard";
-
-const booksData = [
-  {
-    title: "The Tao of the Thirteenth Good",
-    imageUrl: "/books/the-tao-of-the-thirteenth-good.jpg",
-    amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
-  },
-  {
-    title: "Vaccine: A Terrorism Thriller",
-    imageUrl: "/books/vaccine.jpg",
-    amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
-  },
-  {
-    title: "Whip the Dogs",
-    imageUrl: "/books/whip-the-dogs.jpg",
-    amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
-  },
-];
+import { books } from "@/data/books"; // ← fuente única de datos
 
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const el = trackRef.current;
-    if (!el) return;
+    if (!el || books.length === 0) return;
 
-    const middleIndex = Math.floor(booksData.length / 2);
+    const middleIndex = Math.floor(books.length / 2);
     const child = el.children.item(middleIndex) as HTMLElement | null;
     if (!child) return;
 
     const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
-    // Posiciona sin animación para evitar “salto”
-    el.scrollLeft = Math.max(left, 0);
-  }, []);
+    el.scrollLeft = Math.max(left, 0); // evita “salto”
+  }, [books.length]);
 
   const scrollByDir = (dir: "left" | "right") => {
     const el = trackRef.current;
@@ -43,14 +25,13 @@ export default function BooksCarousel() {
     const step = Math.max(280, Math.floor(el.clientWidth * 0.8)); // ~una card
     const target = dir === "left" ? el.scrollLeft - step : el.scrollLeft + step;
 
-    // Preferir scrollTo con behavior:smooth (más consistente que scrollBy)
     if ("scrollTo" in el) {
       (el as any).scrollTo({ left: target, behavior: "smooth" });
     } else {
-      // Fallback
       el.scrollLeft = target;
     }
   };
+
   return (
     <div className="relative z-40 -mt-16 md:-mt-2 ">
       <div className="relative text-white">
@@ -60,6 +41,7 @@ export default function BooksCarousel() {
             clipPath: "polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)",
           }}
         />
+
         {/* Flechas (solo en mobile) */}
         <button
           aria-label="Scroll left"
@@ -93,11 +75,11 @@ export default function BooksCarousel() {
             "[-webkit-overflow-scrolling:touch]",
           ].join(" ")}
         >
-          {booksData.map((book) => (
-            <div key={book.title} className="snap-center shrink-0 md:shrink">
+          {books.map((book) => (
+            <div key={book.id} className="snap-center shrink-0 md:shrink">
               <BookCard
                 title={book.title}
-                imageUrl={book.imageUrl}
+                imageUrl={book.coverSrc} // ← usa coverSrc del data central
                 amazonUrl={book.amazonUrl}
               />
             </div>

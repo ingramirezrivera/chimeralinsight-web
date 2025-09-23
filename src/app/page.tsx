@@ -2,6 +2,7 @@ import Link from "next/link";
 import Hero from "../components/Hero";
 import BooksCarousel from "../components/BooksCarousel";
 import AboutAuthor from "@/components/AboutAuthor";
+import BooksSection from "@/components/BooksSection";
 
 export default function Home() {
   return (
@@ -14,13 +15,12 @@ export default function Home() {
         mainLogoUrl="/images/logo.png"
         mainLogoAltText="Chimeralinsight Logo"
       />
-
-      {/* Aquí irá la nueva sección de libros */}
       <BooksCarousel />
       <AboutAuthor
         photoUrl="/images/author-robin.png"
         siteUrl="https://chimeralinsight.com"
       />
+      <BooksSection /> {/* ✅ sin props */}
     </main>
   );
 }
