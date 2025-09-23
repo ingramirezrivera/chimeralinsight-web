@@ -48,12 +48,12 @@ export default function BooksSection() {
           {books.map((b) => (
             <article
               key={b.id}
-              className="rounded-2xl border border-white/10 bg-teal-900/30 p-4 sm:p-6"
+              className=" rounded-2xl border border-white/10 bg-teal-900/30 p-4 sm:p-6"
             >
               <div className="flex flex-col md:flex-row md:items-start md:gap-8">
                 {/* Cover */}
                 <div className="mx-auto md:mx-0 shrink-0">
-                  <div className="relative h-48 w-36 sm:h-56 md:h-60 lg:h-64 aspect-[3/4]">
+                  <div className="relative h-96 w-64 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
                     <Image
                       src={b.coverSrc}
                       alt={`${b.title} cover`}
@@ -66,34 +66,38 @@ export default function BooksSection() {
                 </div>
 
                 {/* Text */}
-                <div className="mt-5 md:mt-0 flex-1 text-white/95">
-                  <h3 className="text-xl md:text-2xl font-medium">{b.title}</h3>
+                <div className="mt-5 md:mt-10 flex-1 text-white/95">
+                  <h3 className="text-xl md:text-2xl font-large">{b.title}</h3>
 
                   {b.subtitle && (
-                    <p className="mt-1 text-sm text-white/70">{b.subtitle}</p>
+                    <p className="mt-1 text-lg text-white/70">{b.subtitle}</p>
                   )}
 
                   {b.description && (
-                    <p className="mt-3 leading-relaxed text-white/90 md:pr-4">
+                    <p className="mt-3 leading-relaxed text-white/90 md:pr-4 text-xl">
                       {b.description}
                     </p>
                   )}
 
                   {/* Actions */}
-                  <div className="mt-6 flex items-center gap-3">
+                  <div className="m-6 flex items-center justify-center md:justify-start gap-3">
                     {/* ✅ Solo este botón recibe el color rojo */}
                     <CTA
                       href={b.amazonUrl}
                       ariaLabel={`Buy ${b.title} on Amazon`}
-                      className="!bg-[#bd0000] hover:!bg-[#a00000]"
+                      className="!bg-[#bd0000] hover:!bg-[#a00000] px-6 py-3 text-lg"
                     >
                       Buy Now
                     </CTA>
 
-                    <span className="text-white/70 text-sm">or</span>
+                    <span className="text-white/70 text-lg">or</span>
 
                     {/* Learn More conserva su estilo gris */}
-                    <CTA variant="secondary" href={`/books/${b.id}`}>
+                    <CTA
+                      variant="secondary"
+                      href={`/books/${b.id}`}
+                      className="px-6 py-3 text-lg"
+                    >
                       Learn More …
                     </CTA>
                   </div>
