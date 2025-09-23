@@ -12,8 +12,13 @@ interface BookCardProps {
 
 const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
   return (
-    <div className="flex flex-col items-center justify-center ">
-      <div className="w-64 h-auto flex flex-col rounded-b-xl shadow-2xl overflow-hidden bg-surface">
+    <div className="flex flex-col items-center justify-center shrink-0 md:shrink">
+      <div
+        className="w-64 h-auto flex flex-col rounded-2xl bg-surface
+            shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)]
+            hover:shadow-[0_32px_80px_-20px_rgba(0,0,0,0.45)]
+            transition-shadow duration-300 bg-black/70 backdrop-blur-lg"
+      >
         {/* Usar relative y una altura fija para el contenedor de la imagen */}
         <div className="w-full h-96 relative">
           {/* Aquí está el cambio clave: usamos object-contain */}
@@ -28,7 +33,7 @@ const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
           </div>
           <Link
             href={amazonUrl}
-            className="bg-[#bd0000] text-white font-bold py-3 px-6 rounded-lg shadow-md hover:bg-[#a00000] transition-colors duration-300 w-full text-center hover:scale-105"
+            className="bg-[#bd0000] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#a00000] transition-colors duration-300 w-full text-center hover:scale-105"
           >
             Buy Now
           </Link>

@@ -21,7 +21,7 @@ export default function Hero({
 }: HeroProps) {
   return (
     <div
-      className="relative w-full h-96 md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2"
+      className="relative w-full h-120 md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2"
       style={{ backgroundImage: `url(${imageUrl})` }}
       aria-label={altText}
     >
