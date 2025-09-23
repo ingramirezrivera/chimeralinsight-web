@@ -33,7 +33,7 @@ const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
           </div>
           <Link
             href={amazonUrl}
-            className="bg-[#bd0000] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#a00000] transition-colors duration-300 w-full text-center hover:scale-105"
+            className="bg-[#bd0000] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#a00000] transition-colors duration-300 w-full text-center hover:scale-105 hover:[text-decoration:none]"
           >
             Buy Now
           </Link>
