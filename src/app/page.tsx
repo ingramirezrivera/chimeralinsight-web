@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Hero from "../components/Hero";
-import BooksCarousel from "../components/BooksCarousel"; // Importa el nuevo componente
+import BooksCarousel from "../components/BooksCarousel";
+import AboutAuthor from "@/components/AboutAuthor";
 
 export default function Home() {
   return (
@@ -16,6 +17,10 @@ export default function Home() {
 
       {/* Aquí irá la nueva sección de libros */}
       <BooksCarousel />
+      <AboutAuthor
+        photoUrl="/images/author-robin.png"
+        siteUrl="https://chimeralinsight.com"
+      />
     </main>
   );
 }

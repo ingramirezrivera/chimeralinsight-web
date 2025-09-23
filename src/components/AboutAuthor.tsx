@@ -1,0 +1,111 @@
+// src/components/AboutAuthor.tsx
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+
+interface AboutAuthorProps {
+  name?: string;
+  photoUrl?: string; // e.g. "/images/author-robin.jpg"
+  sealUrl?: string; // e.g. "/images/robinr-seal.png"
+  siteUrl?: string; // e.g. "https://chimeralinsight.com"
+}
+
+export default function AboutAuthor({
+  name = "Robin C. Rickards",
+  photoUrl = "/images/author-robin.png",
+  sealUrl = "/images/robinr-logo.png",
+  siteUrl = "https://chimeralinsight.com",
+}: AboutAuthorProps) {
+  return (
+    <section className="relative py-16 bg-white">
+      <div className=" md:max-w-5xl mx-auto px-4">
+        <div className="relative bg-white rounded-2xl shadow-2xl">
+          {/* GRID: foto 4/12, texto 8/12 */}
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-start">
+            {/* Columna: Foto + Sello */}
+            <div className="md:col-span-4 row-start-2 md:row-auto">
+              {/* Foto */}
+              <div className="relative aspect-[3/4] w-full max-w-[320px] md:max-w-none mx-auto rounded-xl overflow-hidden shadow-lg">
+                <Image
+                  src={photoUrl}
+                  alt={`Portrait of ${name}`}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 768px) 320px, 420px"
+                  priority
+                />
+              </div>
+
+              {/* Sello redondo debajo de la foto */}
+              <div className="mt-6 flex justify-center">
+                <div className="relative w-40 h-40 md:w-64 md:h-64  overflow-hidden  rounded-full overflow-hidden bg-transparent shadow-xl">
+                  <Image
+                    src={sealUrl}
+                    alt={`${name} seal`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 1000px) 200px, 200px"
+                    priority
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Columna: Texto */}
+            <div className="md:col-span-8 row-start-1 md:row-auto">
+              <p className="text-neutral-500 font-medium tracking-wide">
+                Author
+              </p>
+              <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
+                {name}
+              </h1>
+
+              <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed">
+                <p>
+                  Robin Rickards is a dual British-Canadian citizen with over 40
+                  years of work in the medical field. He currently works
+                  part-time as an orthopedic surgeon, and lives with his
+                  beautiful Latina wife, four dogs and two cats—and sometimes a
+                  small weasel—near Vancouver, British Columbia. Robin speaks
+                  several languages but only one well (many may even dispute
+                  that!).
+                </p>
+                <p>
+                  Reading has been his passion and writing has always been his
+                  desire. Ideas for his books are derived from reality, past
+                  events and current events; all with a twist, all peppered with
+                  fact and all frighteningly believable.
+                </p>
+                <p>
+                  Robin has five completed novels—each written in the “Thriller”
+                  genre. The sixth is on its way; the seventh and eighth novels
+                  are in the oven. He is a recipient of The Literary Titans Book
+                  Award 2025 for his novel{" "}
+                  <em>Vaccine: A Terrorism Thriller</em>.
+                </p>
+                <p>
+                  Resurrected from the Dead: Robin has brought back to life his
+                  successful older website. Articles deal with subject matter in
+                  each of his novels and will be regularly updated. Please visit
+                  using the link below:
+                </p>
+              </div>
+
+              <div className="mt-6">
+                <Link
+                  href={siteUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand,#111827)] text-white px-5 py-3 font-semibold hover:opacity-90 hover:[text-decoration:none] transition-colors duration-300  text-center hover:scale-105"
+                >
+                  chimeralinsight.com
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
