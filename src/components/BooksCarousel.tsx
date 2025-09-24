@@ -11,14 +11,21 @@ export default function BooksCarousel() {
   // Centrar el ítem medio al montar
   useEffect(() => {
     const el = trackRef.current;
-    if (!el || books.length === 0) return;
+    if (!el) return;
 
-    const middleIndex = Math.floor(books.length / 2);
-    const child = el.children.item(middleIndex) as HTMLElement | null;
-    if (!child) return;
+    // Restaurar posición
+    const saved = sessionStorage.getItem("booksCarouselScroll");
+    if (saved) el.scrollLeft = parseInt(saved, 10) || 0;
 
-    const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
-    el.scrollLeft = Math.max(left, 0);
+    // Guardar mientras se usa
+    const onScroll = () =>
+      sessionStorage.setItem("booksCarouselScroll", String(el.scrollLeft));
+
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      el.removeEventListener("scroll", onScroll);
+      sessionStorage.setItem("booksCarouselScroll", String(el.scrollLeft));
+    };
   }, []);
 
   const scrollByDir = (dir: "left" | "right") => {
