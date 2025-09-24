@@ -39,7 +39,7 @@ export default function AboutAuthor({
 
               {/* Sello redondo debajo de la foto */}
               <div className="mt-6 flex justify-center">
-                <div className="relative w-40 h-40 md:w-64 md:h-64  overflow-hidden  rounded-full overflow-hidden bg-transparent shadow-xl">
+                <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full overflow-hidden bg-transparent shadow-xl">
                   <Image
                     src={sealUrl}
                     alt={`${name} seal`}
