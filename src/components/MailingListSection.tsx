@@ -8,7 +8,7 @@ interface Props {
   blurbTop?: string;
   blurbBottom?: string;
   ctaText?: string;
-  subscribeUrl?: string; // ← si la pasas, hace POST ahí
+  subscribeUrl?: string;
 }
 
 export default function MailingListSection({
@@ -46,7 +46,6 @@ export default function MailingListSection({
           body: JSON.stringify({ email }),
         });
       } else {
-        // Simulación si aún no conectas la API:
         await new Promise((r) => setTimeout(r, 800));
       }
       setStatus("ok");
@@ -59,22 +58,24 @@ export default function MailingListSection({
 
   return (
     <section className="w-full bg-teal-800/80">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-2 md:grid-cols-[1fr_2fr] gap-8 md:gap-12 items-start">
-          <div className="flex justify-center md:justify-start">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-12 md:py-16">
+        {/* ✅ Grid: 1 columna en mobile, 2 en md+ */}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-12 items-start">
+          {/* Imagen */}
+          <div className="order-1 md:order-none flex justify-center md:justify-start">
             <Image
               src="/images/paperplane.png"
               alt="Paper plane doodle"
-              width={240} // tamaño base para calcular el aspect ratio
+              width={240}
               height={160}
-              className="w-40 md:w-76 h-auto pointer-events-none select-none opacity-95"
+              className="w-40 md:w-72 h-auto pointer-events-none select-none opacity-95"
               priority
-              sizes="(min-width: 768px) 15rem, 10rem"
+              sizes="(min-width: 768px) 18rem, 10rem"
             />
           </div>
 
           {/* Texto + Card */}
-          <div>
+          <div className="order-2 md:order-none">
             <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide">
               {title}
             </h2>
