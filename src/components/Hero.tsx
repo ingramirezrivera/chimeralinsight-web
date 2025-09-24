@@ -21,7 +21,7 @@ export default function Hero({
 }: HeroProps) {
   return (
     <div
-      className="relative w-full h-120 md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2"
+      className="relative w-full h-120 md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2 font-sans"
       style={{ backgroundImage: `url(${imageUrl})` }}
       aria-label={altText}
     >
@@ -44,7 +44,7 @@ export default function Hero({
         {mainLogoUrl && mainLogoAltText && (
           <div className="mt-4">
             <Image
-              className="hover:scale-110 transition-transform transition-colors duration-200 ease-in-out w-74 sm:w-150"
+              className="hover:scale-110 transition-transform duration-200 ease-in-out w-74 sm:w-150"
               src="/logo.png"
               alt="Chimeralinsight logo"
               width={600}
