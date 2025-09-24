@@ -8,6 +8,7 @@ import { books } from "@/data/books";
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
 
+  // Centrar el ítem medio al montar
   useEffect(() => {
     const el = trackRef.current;
     if (!el || books.length === 0) return;
@@ -18,7 +19,6 @@ export default function BooksCarousel() {
 
     const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
     el.scrollLeft = Math.max(left, 0);
-    // books es un import estático, así que no hace falta dependencia en el hook
   }, []);
 
   const scrollByDir = (dir: "left" | "right") => {
@@ -35,8 +35,13 @@ export default function BooksCarousel() {
     }
   };
 
+  // Calcula cuáles serán prioritarias (central y vecinas)
+  const mid = Math.floor(books.length / 2);
+  const isPriorityIndex = (i: number) =>
+    i === mid || i === mid - 1 || i === mid + 1;
+
   return (
-    <div className="relative z-40 -mt-16 md:-mt-2 ">
+    <div className="relative z-40 -mt-16 md:-mt-2 font-sans">
       <div className="relative text-white">
         <div
           className="absolute inset-0 -z-10 bg-[var(--brand)]"
@@ -78,12 +83,18 @@ export default function BooksCarousel() {
             "[-webkit-overflow-scrolling:touch]",
           ].join(" ")}
         >
-          {books.map((book) => (
+          {books.map((book, i) => (
             <div key={book.id} className="snap-center shrink-0 md:shrink">
               <BookCard
                 title={book.title}
                 imageUrl={book.coverSrc}
                 amazonUrl={book.amazonUrl}
+                // 👇 Estas props evitan el parpadeo y mejoran la experiencia
+                priority={isPriorityIndex(i)}
+                loading={isPriorityIndex(i) ? "eager" : "lazy"}
+                blurDataURL={
+                  book.blurDataURL /* opcional si lo tienes en data */
+                }
               />
             </div>
           ))}
@@ -100,7 +111,7 @@ export default function BooksCarousel() {
             <Image
               src="/images/amazon-logo.png"
               alt="Amazon Logo"
-              width={384} // ~ md:w-96
+              width={384}
               height={96}
               className="object-contain w-full h-auto"
               priority={false}

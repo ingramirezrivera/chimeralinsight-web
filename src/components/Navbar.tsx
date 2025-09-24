@@ -22,7 +22,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--brand)] shadow-lg">
+    <header className="sticky top-0 z-50 bg-[var(--brand)] shadow-lg font-sans">
       <nav className="container mx-auto h-16 flex items-center justify-center px-10">
         {/* Logo */}
         <Link href="/" aria-current={isActive("/") ? "page" : undefined}>

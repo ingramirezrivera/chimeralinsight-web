@@ -22,7 +22,7 @@ export default function Footer() {
 
   return (
     <footer
-      className="w-full text-gray-300 border-t border-white/10"
+      className="w-full text-gray-300 border-t border-white/10 font-sans font-medium"
       style={{ backgroundColor: "var(--fg, #111827)" }}
       aria-labelledby="site-footer"
     >

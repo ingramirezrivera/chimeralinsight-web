@@ -12,7 +12,7 @@ interface BookCardProps {
 
 const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
   return (
-    <div className="flex flex-col items-center justify-center shrink-0 md:shrink">
+    <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
       <div
         className="w-64 h-auto flex flex-col rounded-2xl bg-surface
             shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)]
@@ -33,7 +33,7 @@ const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
           </div>
           <Link
             href={amazonUrl}
-            className="bg-[#bd0000] text-white font-bold py-3 px-6 rounded-lg hover:bg-[#a00000] transition-colors duration-300 w-full text-center hover:scale-105 hover:[text-decoration:none]"
+            className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
           >
             Buy Now
           </Link>

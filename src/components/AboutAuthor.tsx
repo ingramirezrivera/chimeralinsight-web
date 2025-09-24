@@ -18,7 +18,7 @@ export default function AboutAuthor({
   siteUrl = "https://chimeralinsight.com",
 }: AboutAuthorProps) {
   return (
-    <section className="relative py-16 bg-white">
+    <section className="relative py-16 bg-white font-sans">
       <div className=" md:max-w-5xl mx-auto px-4">
         <div className="relative ">
           {/* GRID: foto 4/12, texto 8/12 */}
@@ -38,7 +38,7 @@ export default function AboutAuthor({
               </div>
 
               {/* Sello redondo debajo de la foto */}
-              <div className="mt-6 flex justify-center">
+              {/*<div className="mt-6 flex justify-center">
                 <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full overflow-hidden bg-transparent shadow-xl">
                   <Image
                     src={sealUrl}
@@ -49,19 +49,19 @@ export default function AboutAuthor({
                     priority
                   />
                 </div>
-              </div>
+              </div>*/}
             </div>
 
             {/* Columna: Texto */}
-            <div className="md:col-span-8 row-start-1 md:row-auto">
-              <p className="text-neutral-500 font-medium tracking-wide">
+            <div className="md:col-span-8 row-start-1 md:row-auto font-sans">
+              <h2 className="text-neutral-500 font-medium tracking-wide">
                 Author
-              </p>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
+              </h2>
+              <h1 className="text-4xl md:text-5xl font-bold text-[#494949] leading-tight mt-1">
                 {name}
               </h1>
 
-              <div className="mt-8 space-y-4 text-neutral-700 leading-relaxed">
+              <div className="mt-5 space-y-4 font-medium text-neutral-700 leading-relaxed font-sans">
                 <p>
                   Robin Rickards is a dual British-Canadian citizen with over 40
                   years of work in the medical field. He currently works
@@ -97,7 +97,7 @@ export default function AboutAuthor({
                   href={siteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-lg bg-[var(--brand,#111827)] text-white px-5 py-3 font-semibold hover:opacity-90 hover:[text-decoration:none] transition-colors duration-300  text-center hover:scale-105"
+                  className="w-full rounded-lg text-cyan-400 hover:bg-cyan-800 bg-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
                 >
                   chimeralinsight.com
                 </Link>

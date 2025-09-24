@@ -57,7 +57,7 @@ export default function MailingListSection({
   }
 
   return (
-    <section className="w-full bg-teal-800/80">
+    <section className="w-full bg-teal-800/80 font-sans">
       <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-12 md:py-16">
         {/* ✅ Grid: 1 columna en mobile, 2 en md+ */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-12 items-start">
