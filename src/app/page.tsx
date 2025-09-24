@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Hero from "../components/Hero";
 import BooksCarousel from "../components/BooksCarousel";
 import AboutAuthor from "@/components/AboutAuthor";

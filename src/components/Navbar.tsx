@@ -5,8 +5,6 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const base = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
-
 const links = [
   { href: "/about", label: "About" },
   { href: "/books", label: "Books" },
@@ -34,6 +32,7 @@ export default function Navbar() {
             alt="Chimeralinsight logo"
             width={280}
             height={40}
+            priority={false}
           />
         </Link>
 
@@ -65,9 +64,16 @@ export default function Navbar() {
           className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600)]"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
+          aria-expanded={open}
+          aria-controls="mobile-menu"
         >
           {!open ? (
-            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
               <path
                 d="M4 6h16M4 12h16M4 18h16"
                 stroke="currentColor"
@@ -75,7 +81,12 @@ export default function Navbar() {
               />
             </svg>
           ) : (
-            <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none">
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
               <path
                 d="M6 6l12 12M18 6L6 18"
                 stroke="currentColor"
@@ -88,7 +99,10 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden border-t border-[var(--brand-600)] bg-[var(--brand)]">
+        <div
+          id="mobile-menu"
+          className="md:hidden border-t border-[var(--brand-600)] bg-[var(--brand)]"
+        >
           <ul className="divide-y divide-[var(--brand-600)]">
             {links.map((link) => (
               <li key={link.href} className="text-center">

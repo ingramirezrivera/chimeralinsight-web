@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useEffect } from "react";
+import Image from "next/image";
 import BookCard from "./BookCard";
-import { books } from "@/data/books"; // ← fuente única de datos
+import { books } from "@/data/books";
 
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -16,17 +17,19 @@ export default function BooksCarousel() {
     if (!child) return;
 
     const left = child.offsetLeft - (el.clientWidth - child.clientWidth) / 2;
-    el.scrollLeft = Math.max(left, 0); // evita “salto”
-  }, [books.length]);
+    el.scrollLeft = Math.max(left, 0);
+    // books es un import estático, así que no hace falta dependencia en el hook
+  }, []);
 
   const scrollByDir = (dir: "left" | "right") => {
     const el = trackRef.current;
     if (!el) return;
-    const step = Math.max(280, Math.floor(el.clientWidth * 0.8)); // ~una card
+
+    const step = Math.max(280, Math.floor(el.clientWidth * 0.8));
     const target = dir === "left" ? el.scrollLeft - step : el.scrollLeft + step;
 
-    if ("scrollTo" in el) {
-      (el as any).scrollTo({ left: target, behavior: "smooth" });
+    if (typeof el.scrollTo === "function") {
+      el.scrollTo({ left: target, behavior: "smooth" } as ScrollToOptions);
     } else {
       el.scrollLeft = target;
     }
@@ -79,7 +82,7 @@ export default function BooksCarousel() {
             <div key={book.id} className="snap-center shrink-0 md:shrink">
               <BookCard
                 title={book.title}
-                imageUrl={book.coverSrc} // ← usa coverSrc del data central
+                imageUrl={book.coverSrc}
                 amazonUrl={book.amazonUrl}
               />
             </div>
@@ -94,10 +97,13 @@ export default function BooksCarousel() {
             rel="noopener noreferrer"
             className="block w-64 md:w-96"
           >
-            <img
+            <Image
               src="/images/amazon-logo.png"
               alt="Amazon Logo"
+              width={384} // ~ md:w-96
+              height={96}
               className="object-contain w-full h-auto"
+              priority={false}
             />
           </a>
         </div>
