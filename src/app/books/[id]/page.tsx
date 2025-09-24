@@ -5,9 +5,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { books } from "@/data/books";
 import BuyRetailerModalButton from "@/components/BuyRetailerModalButton";
-// Si tienes el tipo Retailer en tu data, impórtalo desde ahí. Si no, puedes omitir tipos aquí.
 
 type Props = { params: { id: string } };
+type Retailer = { id: string; label: string; url: string };
 
 export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
@@ -18,7 +18,14 @@ export function generateMetadata({ params }: Props): Metadata {
   if (!book) return { title: "Book not found" };
 
   const desc =
-    book.subtitle || book.description?.slice(0, 160) || "Book details";
+    (typeof (book as Record<string, unknown>).subtitle === "string"
+      ? ((book as Record<string, unknown>).subtitle as string)
+      : undefined) ||
+    (typeof (book as Record<string, unknown>).description === "string"
+      ? ((book as Record<string, unknown>).description as string).slice(0, 160)
+      : undefined) ||
+    "Book details";
+
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
@@ -30,10 +37,34 @@ export default function BookPage({ params }: Props) {
   const book = books.find((b) => b.id === params.id);
   if (!book) notFound();
 
-  const content = (book as any).about ?? book.description ?? "";
-  const retailers = (book as any).retailers as
-    | { id: string; label: string; url: string }[]
-    | undefined;
+  // content: usa `about` si existe y es string; si no, `description`; si no, vacío
+  const aboutValue = (book as Record<string, unknown>)?.about;
+  const descriptionValue = (book as Record<string, unknown>)?.description;
+
+  const content: string =
+    typeof aboutValue === "string"
+      ? aboutValue
+      : typeof descriptionValue === "string"
+      ? descriptionValue
+      : "";
+
+  // retailers: solo si existe y es array con objetos {id,label,url} string
+  const rVal = (book as Record<string, unknown>)?.retailers;
+  const retailers: Retailer[] | undefined = Array.isArray(rVal)
+    ? rVal
+        .filter(
+          (r): r is Retailer =>
+            r &&
+            typeof (r as any).id === "string" &&
+            typeof (r as any).label === "string" &&
+            typeof (r as any).url === "string"
+        )
+        .map((r) => ({
+          id: (r as any).id,
+          label: (r as any).label,
+          url: (r as any).url,
+        }))
+    : undefined;
 
   return (
     <main className="font-sans">
@@ -77,14 +108,19 @@ export default function BookPage({ params }: Props) {
                 {book.title}
               </h1>
 
-              {book.subtitle && (
-                <p className="mt-2 text-xl text-neutral-600">{book.subtitle}</p>
+              {typeof (book as Record<string, unknown>).subtitle ===
+                "string" && (
+                <p className="mt-2 text-xl text-neutral-600">
+                  {(book as Record<string, unknown>).subtitle as string}
+                </p>
               )}
 
               <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed">
-                {content.split(/\n\s*\n/).map((para, i) => (
-                  <p key={i}>{para}</p>
-                ))}
+                {(content ?? "")
+                  .split(/\n\s*\n/)
+                  .map((para: string, i: number) => (
+                    <p key={i}>{para}</p>
+                  ))}
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
@@ -92,7 +128,12 @@ export default function BookPage({ params }: Props) {
                 <BuyRetailerModalButton
                   title={book.title}
                   retailers={retailers}
-                  href={book.amazonUrl} // fallback si no hay retailers
+                  href={
+                    typeof (book as Record<string, unknown>).amazonUrl ===
+                    "string"
+                      ? ((book as Record<string, unknown>).amazonUrl as string)
+                      : undefined
+                  } // fallback si no hay retailers
                   ariaLabel={`Buy ${book.title} on Amazon`}
                   className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
