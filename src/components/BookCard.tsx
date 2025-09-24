@@ -40,14 +40,10 @@ const BookCard = ({
             fill
             className="object-contain"
             sizes="256px"
-            priority={priority}
-            loading={resolvedLoading}
             placeholder="blur"
             blurDataURL={
               blurDataURL ?? "data:image/gif;base64,R0lGODlhAQABAAAAACw="
-            }
-            fetchPriority={priority ? "high" : "auto"}
-            decoding="async"
+            } // fallback 1x1
           />
         </div>
 
