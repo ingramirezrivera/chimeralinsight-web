@@ -8,21 +8,47 @@ interface BookCardProps {
   title: string;
   imageUrl: string;
   amazonUrl: string;
+  priority?: boolean;
+  loading?: "eager" | "lazy";
+  blurDataURL?: string;
 }
 
-const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
+const BookCard = ({
+  title,
+  imageUrl,
+  amazonUrl,
+  priority = false,
+  loading,
+  blurDataURL,
+}: BookCardProps) => {
+  const resolvedLoading: "eager" | "lazy" =
+    loading ?? (priority ? "eager" : "lazy");
+
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
       <div
         className="w-64 h-auto flex flex-col rounded-2xl bg-surface
-            shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)]
-            hover:shadow-[0_32px_80px_-20px_rgba(0,0,0,0.45)]
-            transition-shadow duration-300 bg-black/70 backdrop-blur-lg"
+                   shadow-[0_20px_50px_-12px_rgba(0,0,0,0.35)]
+                   hover:shadow-[0_32px_80px_-20px_rgba(0,0,0,0.45)]
+                   transition-shadow duration-300 bg-black/70 backdrop-blur-lg"
       >
-        {/* Usar relative y una altura fija para el contenedor de la imagen */}
-        <div className="w-full h-96 relative">
-          {/* Aquí está el cambio clave: usamos object-contain */}
-          <Image src={imageUrl} alt={title} fill className="object-contain" />
+        {/* Contenedor estable para la imagen */}
+        <div className="w-full h-96 relative rounded-2xl bg-white/10">
+          <Image
+            src={imageUrl}
+            alt={`${title} cover`}
+            fill
+            className="object-contain"
+            sizes="256px"
+            priority={priority}
+            loading={resolvedLoading}
+            placeholder="blur"
+            blurDataURL={
+              blurDataURL ?? "data:image/gif;base64,R0lGODlhAQABAAAAACw="
+            }
+            fetchPriority={priority ? "high" : "auto"}
+            decoding="async"
+          />
         </div>
 
         <div className="p-4 flex flex-col items-center flex-grow">
@@ -31,9 +57,15 @@ const BookCard = ({ title, imageUrl, amazonUrl }: BookCardProps) => {
               {title}
             </h3>
           </div>
+
           <Link
             href={amazonUrl}
-            className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Buy ${title} on Amazon`}
+            className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
+                       font-semibold px-6 py-3 text-lg transition-colors
+                       text-center mt-4 hover:[text-decoration:none]"
           >
             Buy Now
           </Link>

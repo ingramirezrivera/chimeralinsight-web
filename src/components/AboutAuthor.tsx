@@ -18,7 +18,7 @@ export default function AboutAuthor({
   siteUrl = "https://chimeralinsight.com",
 }: AboutAuthorProps) {
   return (
-    <section className="relative py-16 bg-white font-sans">
+    <section id="about" className="relative py-16 bg-white font-sans">
       <div className=" md:max-w-5xl mx-auto px-4">
         <div className="relative ">
           {/* GRID: foto 4/12, texto 8/12 */}

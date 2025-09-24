@@ -3,21 +3,38 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const links = [
-  { href: "/about", label: "About" },
-  { href: "/books", label: "Books" },
-  { href: "/mailing-list", label: "Mailing List" },
-  { href: "/presskit", label: "Presskit" },
+  { href: "/#about", label: "About" },
+  { href: "/#books", label: "Books" },
+  { href: "/#mailing-list", label: "Mailing List" },
+  { href: "/presskit", label: "Presskit" }, // ruta aparte
 ];
+
+function useHash() {
+  const [hash, setHash] = useState<string>("");
+  useEffect(() => {
+    const update = () => setHash(window.location.hash || "");
+    update();
+    window.addEventListener("hashchange", update, { passive: true });
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+  return hash;
+}
 
 export default function Navbar() {
   const pathname = usePathname();
+  const hash = useHash();
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
+    // anclas de la home
+    if (href.startsWith("/#")) {
+      return pathname === "/" && hash === href.replace("/", ""); // compara "#about", "#books", etc.
+    }
+    // rutas normales
     return pathname === href || pathname.startsWith(href + "/");
   };
 
@@ -27,7 +44,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
           <Image
-            className="hover:scale-110 transition-transform  duration-200 ease-in-out"
+            className="hover:scale-110 transition-transform duration-200 ease-in-out"
             src="/logo.png"
             alt="Chimeralinsight logo"
             width={280}
@@ -47,7 +64,7 @@ export default function Navbar() {
                   "inline-block",
                   "px-3 py-2 text-lg font-medium text-white",
                   "no-underline hover:no-underline focus:no-underline",
-                  "transition-transform  duration-200 ease-in-out",
+                  "transition-transform duration-200 ease-in-out",
                   isActive(link.href)
                     ? "text-[var(--accent)]"
                     : "hover:text-[var(--brand-600)] hover:scale-110",
