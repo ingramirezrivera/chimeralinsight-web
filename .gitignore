@@ -39,3 +39,27 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# --- seguridad/env ---
+.env
+.env.*        # .env.local, .env.production, etc.
+!.env.example # se permite un template sin valores
+
+# --- node/next ---
+node_modules/
+.next/
+out/
+
+# seguridad/env
+.env
+.env.*
+!.env.example
+
+# node/next
+node_modules/
+.next/
+out/
+dist/
+
+# misc
+.DS_Store

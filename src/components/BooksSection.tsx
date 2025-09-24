@@ -87,7 +87,7 @@ export default function BooksSection() {
                       ariaLabel={`Buy ${b.title} on Amazon`}
                       className="!bg-[#bd0000] hover:!bg-[#a00000] px-6 py-3 text-lg"
                     >
-                      Buy Now
+                      Buy on Amazon
                     </CTA>
 
                     <span className="text-white/70 text-lg">or</span>
