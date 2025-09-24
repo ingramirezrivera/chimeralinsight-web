@@ -96,12 +96,9 @@ export default function BooksCarousel() {
                 title={book.title}
                 imageUrl={book.coverSrc}
                 amazonUrl={book.amazonUrl}
-                // 👇 Estas props evitan el parpadeo y mejoran la experiencia
                 priority={isPriorityIndex(i)}
                 loading={isPriorityIndex(i) ? "eager" : "lazy"}
-                blurDataURL={
-                  book.blurDataURL /* opcional si lo tienes en data */
-                }
+                blurDataURL={book.blurDataURL} // si lo tienes en tu data
               />
             </div>
           ))}
