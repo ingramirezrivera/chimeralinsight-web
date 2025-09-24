@@ -27,7 +27,7 @@ export default function Navbar() {
         {/* Logo */}
         <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
           <Image
-            className="hover:scale-110 transition-transform transition-colors duration-200 ease-in-out"
+            className="hover:scale-110 transition-transform  duration-200 ease-in-out"
             src="/logo.png"
             alt="Chimeralinsight logo"
             width={280}
@@ -47,7 +47,7 @@ export default function Navbar() {
                   "inline-block",
                   "px-3 py-2 text-lg font-medium text-white",
                   "no-underline hover:no-underline focus:no-underline",
-                  "transition-transform transition-colors duration-200 ease-in-out",
+                  "transition-transform  duration-200 ease-in-out",
                   isActive(link.href)
                     ? "text-[var(--accent)]"
                     : "hover:text-[var(--brand-600)] hover:scale-110",

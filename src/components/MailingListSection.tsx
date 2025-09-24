@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 
 interface Props {
   title?: string;
@@ -59,10 +60,17 @@ export default function MailingListSection({
   return (
     <section className="w-full bg-teal-800/80">
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-        <div className="grid grid-cols-1 md:grid-cols-[220px,1fr] items-start gap-8 md:gap-12">
-          {/* Avión decorativo (oculto en mobile) */}
-          <div className="hidden md:flex items-center justify-center">
-            <PaperPlane className="h-40 w-40 text-white/80" />
+        <div className="grid grid-cols-2 md:grid-cols-[1fr_2fr] gap-8 md:gap-12 items-start">
+          <div className="flex justify-center md:justify-start">
+            <Image
+              src="/images/paperplane.png"
+              alt="Paper plane doodle"
+              width={240} // tamaño base para calcular el aspect ratio
+              height={160}
+              className="w-40 md:w-76 h-auto pointer-events-none select-none opacity-95"
+              priority
+              sizes="(min-width: 768px) 15rem, 10rem"
+            />
           </div>
 
           {/* Texto + Card */}
@@ -122,24 +130,5 @@ export default function MailingListSection({
         </div>
       </div>
     </section>
-  );
-}
-
-function PaperPlane({ className = "" }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 200 200"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="4"
-      className={className}
-    >
-      <path
-        d="M30 80c-2 15 2 30 14 38 8 6 18 8 30 4"
-        strokeDasharray="8 10"
-        strokeLinecap="round"
-      />
-      <path d="M70 100l90-30-60 62-8-22-22-10z" fill="currentColor" />
-    </svg>
   );
 }
