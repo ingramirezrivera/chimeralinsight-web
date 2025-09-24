@@ -1,3 +1,4 @@
+// Navbar.tsx (fragmento)
 "use client";
 
 import Link from "next/link";
@@ -9,33 +10,57 @@ const links = [
   { href: "/#about", label: "About" },
   { href: "/#books", label: "Books" },
   { href: "/#mailing-list", label: "Mailing List" },
-  { href: "/presskit", label: "Presskit" }, // ruta aparte
+  { href: "/presskit", label: "Presskit" },
 ];
 
-function useHash() {
-  const [hash, setHash] = useState<string>("");
-  useEffect(() => {
-    const update = () => setHash(window.location.hash || "");
-    update();
-    window.addEventListener("hashchange", update, { passive: true });
-    return () => window.removeEventListener("hashchange", update);
-  }, []);
-  return hash;
-}
+// Easing y scroll con duración controlada
+const smoothScrollTo = (to: number, duration = 450) => {
+  const start = window.scrollY || window.pageYOffset;
+  const diff = to - start;
+  let startTime: number | null = null;
+  const ease = (t: number) =>
+    t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+  const step = (ts: number) => {
+    if (startTime === null) startTime = ts;
+    const p = Math.min((ts - startTime) / duration, 1);
+    window.scrollTo(0, start + diff * ease(p));
+    if (p < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+};
 
 export default function Navbar() {
   const pathname = usePathname();
-  const hash = useHash();
   const [open, setOpen] = useState(false);
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    // anclas de la home
-    if (href.startsWith("/#")) {
-      return pathname === "/" && hash === href.replace("/", ""); // compara "#about", "#books", etc.
-    }
-    // rutas normales
+    if (href.startsWith("/#")) return pathname === "/";
     return pathname === href || pathname.startsWith(href + "/");
+  };
+
+  // ⚡️ Intercepta los clics a anclas y hace scroll rápido
+  const handleAnchorClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    const isAnchor = href.startsWith("#") || href.startsWith("/#");
+    const isHome = pathname === "/";
+    if (!isAnchor || !isHome) return; // deja que Next navegue si no estás en "/"
+
+    e.preventDefault();
+    const id = href.replace("/#", "#");
+    const el = document.querySelector<HTMLElement>(id);
+    if (!el) return;
+
+    // Altura del header (ajusta si cambia el alto)
+    const HEADER_OFFSET = 96; // px (h-16 = 64px + margen/extra; ajusta a tu caso)
+    const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+    smoothScrollTo(y, 420); // 420ms: más ágil que el nativo
+
+    setOpen(false);
+    // Opcional: actualiza el hash sin saltos
+    history.replaceState(null, "", id);
   };
 
   return (
@@ -49,7 +74,6 @@ export default function Navbar() {
             alt="Chimeralinsight logo"
             width={280}
             height={40}
-            priority={false}
           />
         </Link>
 
@@ -59,10 +83,10 @@ export default function Navbar() {
             <li key={link.href}>
               <Link
                 href={link.href}
+                onClick={(e) => handleAnchorClick(e, link.href)}
                 aria-current={isActive(link.href) ? "page" : undefined}
                 className={[
-                  "inline-block",
-                  "px-3 py-2 text-lg font-medium text-white",
+                  "inline-block px-3 py-2 text-lg font-medium text-white",
                   "no-underline hover:no-underline focus:no-underline",
                   "transition-transform duration-200 ease-in-out",
                   isActive(link.href)
@@ -84,33 +108,19 @@ export default function Navbar() {
           aria-expanded={open}
           aria-controls="mobile-menu"
         >
-          {!open ? (
-            <svg
-              className="w-8 h-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
-          ) : (
-            <svg
-              className="w-8 h-8"
-              viewBox="0 0 24 24"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M6 6l12 12M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="2"
-              />
-            </svg>
-          )}
+          {/* ...tus íconos... */}
+          <svg
+            className="w-8 h-8"
+            viewBox="0 0 24 24"
+            fill="none"
+            aria-hidden="true"
+          >
+            <path
+              d="M4 6h16M4 12h16M4 18h16"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+          </svg>
         </button>
       </nav>
 
@@ -125,7 +135,7 @@ export default function Navbar() {
               <li key={link.href} className="text-center">
                 <Link
                   href={link.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => handleAnchorClick(e, link.href)}
                   aria-current={isActive(link.href) ? "page" : undefined}
                   className={[
                     "block w-full px-6 py-4 text-white text-base font-medium",

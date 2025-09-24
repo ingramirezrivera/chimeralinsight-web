@@ -8,6 +8,10 @@ interface BookCardProps {
   title: string;
   imageUrl: string;
   amazonUrl: string;
+  /** Ruta a la página del libro, ej: /books/tao */
+  bookHref?: string;
+  /** Sección a la que quieres saltar, ej: "buy" (por defecto) */
+  sectionId?: string;
   priority?: boolean;
   loading?: "eager" | "lazy";
   blurDataURL?: string;
@@ -17,12 +21,20 @@ const BookCard = ({
   title,
   imageUrl,
   amazonUrl,
+  bookHref,
+  sectionId = "buy",
   priority = false,
   loading,
   blurDataURL,
 }: BookCardProps) => {
   const resolvedLoading: "eager" | "lazy" =
     loading ?? (priority ? "eager" : "lazy");
+
+  // Si hay bookHref, construye /books/[id]#buy; si no, usa amazonUrl
+  const href = bookHref
+    ? `${bookHref}${sectionId ? `#${sectionId}` : ""}`
+    : amazonUrl;
+  const isExternal = !bookHref; // si no hay page del libro, abrimos Amazon en nueva pestaña
 
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
@@ -43,7 +55,9 @@ const BookCard = ({
             placeholder="blur"
             blurDataURL={
               blurDataURL ?? "data:image/gif;base64,R0lGODlhAQABAAAAACw="
-            } // fallback 1x1
+            }
+            priority={priority}
+            loading={resolvedLoading}
           />
         </div>
 
@@ -55,10 +69,11 @@ const BookCard = ({
           </div>
 
           <Link
-            href={amazonUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Buy ${title} on Amazon`}
+            href={href}
+            {...(isExternal
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+            aria-label={`Buy ${title} ${isExternal ? "on Amazon" : ""}`}
             className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                        font-semibold px-6 py-3 text-lg transition-colors
                        text-center mt-4 hover:[text-decoration:none]"

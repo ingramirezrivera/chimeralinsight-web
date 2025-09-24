@@ -1,15 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 
 type NavItem = { label: string; href: string };
 
 const primaryNav: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "About", href: "/about" },
-  { label: "Books", href: "/books" },
-  { label: "Contact", href: "/contact" },
+  { label: "About", href: "/#about" },
+  { label: "Books", href: "/#books" }, // 👈 sección del landing
+  { label: "Presskit", href: "presskit" }, // 👈 página independiente
+  { label: "Contact", href: "/presskit#contact" }, // 👈 formulario en presskit
+  { label: "Mailing List", href: "#mailing-list" }, // opcional si existe
 ];
 
 const legalNav: NavItem[] = [
@@ -31,18 +32,15 @@ export default function Footer() {
       </h2>
 
       {/* Top area */}
-      <div className=" ml-10 md:mx-auto max-w-7xl px-6 py-12 ">
+      <div className="md:mx-auto max-w-7xl px-6 py-12">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              {/* Logo real */}
-
               <span className="text-lg font-semibold tracking-wide">
                 Chimeral Insight
               </span>
             </Link>
-
             <p className="text-sm text-gray-400 leading-relaxed">
               Appearances may be deceptive.
             </p>
@@ -82,9 +80,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Contact & Social */}
+          {/* Social */}
           <div className="space-y-4">
-            {/* Socials (solo Facebook por ahora) */}
             <div className="pt-2">
               <span className="text-sm font-semibold text-white/90">
                 Follow
@@ -98,7 +95,6 @@ export default function Footer() {
                   aria-label="Facebook"
                   title="Facebook"
                 >
-                  {/* Ícono Facebook (SVG inline, sin dependencias) */}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="currentColor"
@@ -109,7 +105,6 @@ export default function Footer() {
                     <path d="M22 12a10 10 0 1 0-11.5 9.9v-7H8v-3h2.5V9.5a3.5 3.5 0 0 1 3.8-3.9c1.1 0 2.2.2 2.2.2v2.4h-1.3c-1.3 0-1.7.8-1.7 1.6V12H18l-.5 3h-2.9v7A10 10 0 0 0 22 12z" />
                   </svg>
                 </Link>
-                {/* Cuando tengas más redes, añade más <Link> aquí */}
               </div>
             </div>
           </div>
