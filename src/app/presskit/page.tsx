@@ -173,21 +173,6 @@ export default function PresskitPage() {
             ))}
           </div>
         </div>
-
-        {/* CONTACTO */}
-        <section id="contact" className="bg-white">
-          <div className="mx-auto max-w-3xl px-6 pb-10 md:pb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-[#494949]">
-              Press Contact
-            </h2>
-            <p className="mt-2 text-neutral-600">
-              For interviews and press materials, please send us a message:
-            </p>
-            <div className="mt-4 rounded-xl border border-neutral-200 p-5">
-              <PressContactForm />
-            </div>
-          </div>
-        </section>
       </section>
     </main>
   );
