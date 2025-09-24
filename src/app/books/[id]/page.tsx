@@ -6,25 +6,30 @@ import { notFound } from "next/navigation";
 import { books } from "@/data/books";
 import BuyRetailerModalButton from "@/components/BuyRetailerModalButton";
 
-type Props = { params: { id: string } };
+type Book = (typeof books)[number];
 type Retailer = { id: string; label: string; url: string };
+type Extras = {
+  about?: string;
+  retailers?: Retailer[];
+  amazonUrl?: string;
+};
 
 export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
 }
 
-export function generateMetadata({ params }: Props): Metadata {
-  const book = books.find((b) => b.id === params.id);
+// En Next 15, params llega como Promise
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const book = books.find((b) => b.id === id);
   if (!book) return { title: "Book not found" };
 
   const desc =
-    (typeof (book as Record<string, unknown>).subtitle === "string"
-      ? ((book as Record<string, unknown>).subtitle as string)
-      : undefined) ||
-    (typeof (book as Record<string, unknown>).description === "string"
-      ? ((book as Record<string, unknown>).description as string).slice(0, 160)
-      : undefined) ||
-    "Book details";
+    book.subtitle ?? book.description?.slice(0, 160) ?? "Book details";
 
   return {
     title: `${book.title} | Chimeralinsight`,
@@ -33,42 +38,27 @@ export function generateMetadata({ params }: Props): Metadata {
   };
 }
 
-export default function BookPage({ params }: Props) {
-  const book = books.find((b) => b.id === params.id);
+export default async function BookPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const book = books.find((b) => b.id === id) as Book | undefined;
   if (!book) notFound();
 
-  // content: usa `about` si existe y es string; si no, `description`; si no, vacío
-  const aboutValue = (book as Record<string, unknown>)?.about;
-  const descriptionValue = (book as Record<string, unknown>)?.description;
+  // Campos opcionales que algunos libros pueden traer
+  const extras = book as unknown as Extras;
 
-  const content: string =
-    typeof aboutValue === "string"
-      ? aboutValue
-      : typeof descriptionValue === "string"
-      ? descriptionValue
-      : "";
-
-  // retailers: solo si existe y es array con objetos {id,label,url} string
-  const rVal = (book as Record<string, unknown>)?.retailers;
-  const retailers: Retailer[] | undefined = Array.isArray(rVal)
-    ? rVal
-        .filter(
-          (r): r is Retailer =>
-            r &&
-            typeof (r as any).id === "string" &&
-            typeof (r as any).label === "string" &&
-            typeof (r as any).url === "string"
-        )
-        .map((r) => ({
-          id: (r as any).id,
-          label: (r as any).label,
-          url: (r as any).url,
-        }))
+  const content: string = extras.about ?? book.description ?? "";
+  const retailers: Retailer[] | undefined = Array.isArray(extras.retailers)
+    ? extras.retailers
     : undefined;
 
   return (
     <main className="font-sans">
-      {/* Cabecera simple fuera del landing */}
+      {/* Cabecera simple */}
       <header className="bg-[var(--brand)] text-white shadow">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="no-underline hover:no-underline">
@@ -108,11 +98,8 @@ export default function BookPage({ params }: Props) {
                 {book.title}
               </h1>
 
-              {typeof (book as Record<string, unknown>).subtitle ===
-                "string" && (
-                <p className="mt-2 text-xl text-neutral-600">
-                  {(book as Record<string, unknown>).subtitle as string}
-                </p>
+              {book.subtitle && (
+                <p className="mt-2 text-xl text-neutral-600">{book.subtitle}</p>
               )}
 
               <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed">
@@ -124,16 +111,11 @@ export default function BookPage({ params }: Props) {
               </div>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
-                {/* ⬇️ Mismas clases; ahora abre el modal si hay retailers */}
+                {/* Abre modal si hay retailers; si no, usa href */}
                 <BuyRetailerModalButton
                   title={book.title}
                   retailers={retailers}
-                  href={
-                    typeof (book as Record<string, unknown>).amazonUrl ===
-                    "string"
-                      ? ((book as Record<string, unknown>).amazonUrl as string)
-                      : undefined
-                  } // fallback si no hay retailers
+                  href={extras.amazonUrl}
                   ariaLabel={`Buy ${book.title} on Amazon`}
                   className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
