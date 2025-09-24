@@ -20,7 +20,7 @@ export default function AboutAuthor({
   return (
     <section className="relative py-16 bg-white">
       <div className=" md:max-w-5xl mx-auto px-4">
-        <div className="relative bg-white rounded-2xl shadow-2xl">
+        <div className="relative ">
           {/* GRID: foto 4/12, texto 8/12 */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-start">
             {/* Columna: Foto + Sello */}
@@ -61,7 +61,7 @@ export default function AboutAuthor({
                 {name}
               </h1>
 
-              <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed">
+              <div className="mt-8 space-y-4 text-neutral-700 leading-relaxed">
                 <p>
                   Robin Rickards is a dual British-Canadian citizen with over 40
                   years of work in the medical field. He currently works

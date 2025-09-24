@@ -36,7 +36,7 @@ export default function Hero({
               alt={sealLogoAltText}
               width={300}
               height={300}
-              className="object-contain hover:scale-110 transition-transform transition-colors duration-200 ease-in-out w-32 sm:w-76"
+              className="object-contain hover:scale-110 transition-transform duration-200 ease-in-out w-32 sm:w-76"
             />
           </div>
         )}
