@@ -7,8 +7,9 @@ import Link from "next/link";
 interface BookCardProps {
   title: string;
   imageUrl: string;
-  amazonUrl: string;
-  /** Ruta a la página del libro, ej: /books/tao */
+  /** URL externa a Amazon (opcional) */
+  amazonUrl?: string;
+  /** Ruta interna a la página del libro, ej: /books/tao (opcional) */
   bookHref?: string;
   /** Sección a la que quieres saltar, ej: "buy" (por defecto) */
   sectionId?: string;
@@ -30,11 +31,18 @@ const BookCard = ({
   const resolvedLoading: "eager" | "lazy" =
     loading ?? (priority ? "eager" : "lazy");
 
-  // Si hay bookHref, construye /books/[id]#buy; si no, usa amazonUrl
-  const href = bookHref
-    ? `${bookHref}${sectionId ? `#${sectionId}` : ""}`
-    : amazonUrl;
-  const isExternal = !bookHref; // si no hay page del libro, abrimos Amazon en nueva pestaña
+  const hasBookPage = typeof bookHref === "string" && bookHref.length > 0;
+  const hasAmazon = typeof amazonUrl === "string" && amazonUrl.length > 0;
+
+  // Si hay bookHref, construye /books/[id]#buy; si no, usa amazonUrl; si no hay nada, "#"
+  const href: string = hasBookPage
+    ? `${bookHref!}${sectionId ? `#${sectionId}` : ""}`
+    : hasAmazon
+    ? amazonUrl!
+    : "#";
+
+  // externo solo si vamos a Amazon (cuando no hay page interna)
+  const isExternal = !hasBookPage && hasAmazon;
 
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
@@ -73,12 +81,12 @@ const BookCard = ({
             {...(isExternal
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            aria-label={`Buy ${title} ${isExternal ? "on Amazon" : ""}`}
+            aria-label={`Buy ${title}${isExternal ? " on Amazon" : ""}`}
             className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                        font-semibold px-6 py-3 text-lg transition-colors
                        text-center mt-4 hover:[text-decoration:none]"
           >
-            Buy Now
+            Available Oct 1st
           </Link>
         </div>
       </div>

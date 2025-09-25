@@ -91,7 +91,7 @@ export default function BooksCarousel() {
                 <BookCard
                   title={book.title}
                   imageUrl={book.coverSrc}
-                  amazonUrl={book.amazonUrl} // fallback si algún día no tienes page
+                  amazonUrl={book.amazonUrl ?? `/books/${book.id}#buy`} // fallback si algún día no tienes page
                   bookHref={`/books/${book.id}`} // 👈 navega a la página del libro
                   sectionId="buy" // 👈 salta a la sección #buy
                   priority={isPriority}
