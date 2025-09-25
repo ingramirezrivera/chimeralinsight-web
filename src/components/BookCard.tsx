@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { withBasePath } from "@/lib/paths";
 
 interface BookCardProps {
   title: string;
@@ -55,7 +56,7 @@ const BookCard = ({
         {/* Contenedor estable para la imagen */}
         <div className="w-full h-96 relative rounded-2xl bg-white/10">
           <Image
-            src={imageUrl}
+            src={withBasePath(imageUrl)}
             alt={`${title} cover`}
             fill
             className="object-contain"

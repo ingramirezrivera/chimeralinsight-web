@@ -3,6 +3,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { withBasePath } from "@/lib/paths";
 
 interface AboutAuthorProps {
   name?: string;
@@ -26,7 +27,7 @@ export default function AboutAuthor({
               {/* Foto */}
               <div className="relative aspect-[3/4] w-full max-w-[320px] md:max-w-none mx-auto rounded-xl overflow-hidden shadow-lg">
                 <Image
-                  src={photoUrl}
+                  src={withBasePath(photoUrl)}
                   alt={`Portrait of ${name}`}
                   fill
                   className="object-cover"
@@ -39,7 +40,7 @@ export default function AboutAuthor({
               <div className="mt-6 flex justify-center">
                 <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full overflow-hidden bg-transparent shadow-xl">
                   <Image
-                    src={sealUrl}
+                    src={withBasePath(sealUrl)}
                     alt={`${name} seal`}
                     fill
                     className="object-cover"
