@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { books } from "@/data/books";
+import { withBasePath } from "@/lib/paths";
 
 type Retailer = { id: string; label: string; url: string };
 
@@ -182,7 +183,7 @@ export default function BooksSection() {
                   <div className="mx-auto md:mx-0 shrink-0">
                     <div className="relative h-96 w-64 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
                       <Image
-                        src={b.coverSrc}
+                        src={withBasePath(b.coverSrc)}
                         alt={`${b.title} cover`}
                         fill
                         className="rounded shadow-md object-cover"

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { books } from "@/data/books";
 import BuyRetailerModalButton from "@/components/BuyRetailerModalButton";
+import { withBasePath } from "@/lib/paths";
 
 type Book = (typeof books)[number];
 type Retailer = { id: string; label: string; url: string };
@@ -144,7 +145,7 @@ export default async function BookPage({
               className="block w-64 md:w-96"
             >
               <Image
-                src="/images/amazon-logo.png"
+                src={withBasePath("/images/amazon-logo.png")}
                 alt="Amazon Logo"
                 width={384}
                 height={96}
