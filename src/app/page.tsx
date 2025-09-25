@@ -16,12 +16,9 @@ export default function Home() {
         mainLogoAltText="Chimeralinsight Logo"
       />
       <BooksCarousel />
-      <AboutAuthor
-        photoUrl="/images/author-robin.png"
-        siteUrl="https://chimeralinsight.com"
-      />
+      <AboutAuthor photoUrl="/images/author-robin.png" />
       <BooksSection /> {/* ✅ sin props */}
-      <MailingListSection subscribeUrl="/api/subscribe" />
+      {/* <MailingListSection subscribeUrl="/api/subscribe" /> */}
     </main>
   );
 }
