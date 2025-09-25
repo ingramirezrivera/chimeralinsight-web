@@ -86,7 +86,7 @@ const BookCard = ({
                        font-semibold px-6 py-3 text-lg transition-colors
                        text-center mt-4 hover:[text-decoration:none]"
           >
-            Available Oct 1st
+            Buy
           </Link>
         </div>
       </div>
