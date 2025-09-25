@@ -4,11 +4,22 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { books } from "@/data/books"; // única fuente de datos
+import { books } from "@/data/books";
 
 type Retailer = { id: string; label: string; url: string };
 
-// ✅ Componente CTA centralizado (se añade onClick opcional)
+// Define el shape mínimo que usas en la UI
+type Book = {
+  id: string;
+  title: string;
+  coverSrc: string;
+  subtitle?: string;
+  description?: string;
+  amazonUrl?: string;
+  retailers?: Retailer[];
+};
+
+// CTA reutilizable
 function CTA({
   href,
   children,
@@ -25,14 +36,12 @@ function CTA({
   ariaLabel?: string;
   className?: string;
   fullWidth?: boolean;
-  isDisabled?: boolean; // simulado para <a>
-  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void; // ← NUEVO
+  isDisabled?: boolean;
+  onClick?: (e: React.MouseEvent<HTMLAnchorElement>) => void;
 }) {
   const base =
-    "rounded-md px-4 py-2 text-sm font-medium transition " +
-    "focus:outline-none focus:ring-2 focus:ring-offset-2 no-underline";
+    "rounded-md px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 no-underline";
 
-  // 👇 Para que w-full funcione, usa display:flex (no inline-flex)
   const display = fullWidth
     ? "flex w-full justify-center"
     : "inline-flex items-center justify-center";
@@ -54,7 +63,7 @@ function CTA({
       aria-label={ariaLabel}
       aria-disabled={isDisabled || undefined}
       tabIndex={isDisabled ? -1 : 0}
-      onClick={onClick} // ← pasa el handler si viene
+      onClick={onClick}
       className={`${base} ${display} ${variants} ${disabledClasses} ${className}`}
     >
       {children}
@@ -62,7 +71,7 @@ function CTA({
   );
 }
 
-// ✅ Modal con blur (inline para mantener todo en este archivo)
+// Modal con blur
 function RetailerModal({
   open,
   onClose,
@@ -159,10 +168,9 @@ export default function BooksSection() {
         </h2>
 
         <div className="space-y-12 md:space-y-16">
-          {books.map((b) => {
-            const retailers = (b as any).retailers as Retailer[] | undefined;
-            const hasRetailers =
-              Array.isArray(retailers) && retailers.length > 0;
+          {(books as Book[]).map((b) => {
+            const retailers: Retailer[] = b.retailers ?? [];
+            const hasRetailers = retailers.length > 0;
 
             return (
               <article
@@ -209,11 +217,11 @@ export default function BooksSection() {
                         className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
                         onClick={
                           hasRetailers
-                            ? (e) => {
+                            ? (e: React.MouseEvent<HTMLAnchorElement>) => {
                                 e.preventDefault();
                                 setSelected({
                                   title: b.title,
-                                  retailers: retailers!,
+                                  retailers,
                                 });
                               }
                             : undefined

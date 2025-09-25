@@ -7,15 +7,13 @@ import Link from "next/link";
 interface AboutAuthorProps {
   name?: string;
   photoUrl?: string; // e.g. "/images/author-robin.jpg"
-  sealUrl?: string; // e.g. "/images/robinr-seal.png"
-  siteUrl?: string; // e.g. "https://chimeralinsight.com"
+  sealUrl?: string;
 }
 
 export default function AboutAuthor({
   name = "Robin C. Rickards",
   photoUrl = "/images/author-robin.png",
   sealUrl = "/images/robinr-logo.png",
-  siteUrl = "https://chimeralinsight.com",
 }: AboutAuthorProps) {
   return (
     <section id="about" className="relative py-16 bg-white font-sans">
@@ -38,7 +36,7 @@ export default function AboutAuthor({
               </div>
 
               {/* Sello redondo debajo de la foto */}
-              {/*<div className="mt-6 flex justify-center">
+              <div className="mt-6 flex justify-center">
                 <div className="relative w-40 h-40 md:w-64 md:h-64 rounded-full overflow-hidden bg-transparent shadow-xl">
                   <Image
                     src={sealUrl}
@@ -49,7 +47,7 @@ export default function AboutAuthor({
                     priority
                   />
                 </div>
-              </div>*/}
+              </div>
             </div>
 
             {/* Columna: Texto */}

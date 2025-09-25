@@ -1,10 +1,10 @@
-// Navbar.tsx (fragmento)
+// src/components/Navbar.tsx
 "use client";
 
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState, type MouseEvent } from "react";
 
 const links = [
   { href: "/#about", label: "About" },
@@ -32,16 +32,18 @@ const smoothScrollTo = (to: number, duration = 450) => {
 export default function Navbar() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const bp = process.env.NEXT_PUBLIC_BASE_PATH ?? ""; // basePath público (Pages)
 
+  // No marcamos anclas como "active" para que el hover funcione en home
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
-    if (href.startsWith("/#")) return pathname === "/";
+    if (href.startsWith("/#")) return false;
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  // ⚡️ Intercepta los clics a anclas y hace scroll rápido
+  // Intercepta clics a anclas y hace scroll suave si estás en "/"
   const handleAnchorClick = (
-    e: React.MouseEvent<HTMLAnchorElement>,
+    e: MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
     const isAnchor = href.startsWith("#") || href.startsWith("/#");
@@ -53,14 +55,12 @@ export default function Navbar() {
     const el = document.querySelector<HTMLElement>(id);
     if (!el) return;
 
-    // Altura del header (ajusta si cambia el alto)
-    const HEADER_OFFSET = 96; // px (h-16 = 64px + margen/extra; ajusta a tu caso)
+    const HEADER_OFFSET = 96; // px
     const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-    smoothScrollTo(y, 420); // 420ms: más ágil que el nativo
+    smoothScrollTo(y, 420);
 
     setOpen(false);
-    // Opcional: actualiza el hash sin saltos
-    history.replaceState(null, "", id);
+    history.replaceState(null, "", id); // actualiza hash sin salto
   };
 
   return (
@@ -70,10 +70,11 @@ export default function Navbar() {
         <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
           <Image
             className="hover:scale-110 transition-transform duration-200 ease-in-out"
-            src="/logo.png"
+            src={`${bp}/logo.png`} // respeta /chimeralinsight-web en GitHub Pages
             alt="Chimeralinsight logo"
             width={280}
             height={40}
+            priority
           />
         </Link>
 
@@ -89,9 +90,8 @@ export default function Navbar() {
                   "inline-block px-3 py-2 text-lg font-medium text-white",
                   "no-underline hover:no-underline focus:no-underline",
                   "transition-transform duration-200 ease-in-out",
-                  isActive(link.href)
-                    ? "text-[var(--accent)]"
-                    : "hover:text-[var(--brand-600)] hover:scale-110",
+                  "hover:text-[var(--brand-600)] hover:scale-110", // hover SIEMPRE
+                  isActive(link.href) ? "text-[var(--accent)]" : "",
                 ].join(" ")}
               >
                 {link.label}
@@ -108,7 +108,6 @@ export default function Navbar() {
           aria-expanded={open}
           aria-controls="mobile-menu"
         >
-          {/* ...tus íconos... */}
           <svg
             className="w-8 h-8"
             viewBox="0 0 24 24"
@@ -140,9 +139,8 @@ export default function Navbar() {
                   className={[
                     "block w-full px-6 py-4 text-white text-base font-medium",
                     "no-underline hover:no-underline focus:no-underline",
-                    isActive(link.href)
-                      ? "text-[var(--accent)]"
-                      : "hover:text-[var(--brand-600)]",
+                    "hover:text-[var(--brand-600)]",
+                    isActive(link.href) ? "text-[var(--accent)]" : "",
                   ].join(" ")}
                 >
                   {link.label}
