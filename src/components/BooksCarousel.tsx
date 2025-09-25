@@ -1,3 +1,4 @@
+// src/components/BooksCarousel.tsx
 "use client";
 
 import { useRef, useEffect } from "react";
@@ -23,10 +24,8 @@ export default function BooksCarousel() {
   const scrollByDir = (dir: "left" | "right") => {
     const el = trackRef.current;
     if (!el) return;
-
     const step = Math.max(280, Math.floor(el.clientWidth * 0.8));
     const target = dir === "left" ? el.scrollLeft - step : el.scrollLeft + step;
-
     if (typeof el.scrollTo === "function") {
       el.scrollTo({ left: target, behavior: "smooth" } as ScrollToOptions);
     } else {
@@ -92,10 +91,11 @@ export default function BooksCarousel() {
                 <BookCard
                   title={book.title}
                   imageUrl={book.coverSrc}
-                  amazonUrl={book.amazonUrl}
+                  amazonUrl={book.amazonUrl ?? `/books/${book.id}#buy`} // fallback si algún día no tienes page
+                  bookHref={`/books/${book.id}`} // 👈 navega a la página del libro
+                  sectionId="buy" // 👈 salta a la sección #buy
                   priority={isPriority}
                   loading={imgLoading}
-                  // ❌ blurDataURL eliminado porque no existe en 'books'
                 />
               </div>
             );

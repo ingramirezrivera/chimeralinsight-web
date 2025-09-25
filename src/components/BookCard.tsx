@@ -7,7 +7,12 @@ import Link from "next/link";
 interface BookCardProps {
   title: string;
   imageUrl: string;
-  amazonUrl: string;
+  /** URL externa a Amazon (opcional) */
+  amazonUrl?: string;
+  /** Ruta interna a la página del libro, ej: /books/tao (opcional) */
+  bookHref?: string;
+  /** Sección a la que quieres saltar, ej: "buy" (por defecto) */
+  sectionId?: string;
   priority?: boolean;
   loading?: "eager" | "lazy";
   blurDataURL?: string;
@@ -17,12 +22,27 @@ const BookCard = ({
   title,
   imageUrl,
   amazonUrl,
+  bookHref,
+  sectionId = "buy",
   priority = false,
   loading,
   blurDataURL,
 }: BookCardProps) => {
   const resolvedLoading: "eager" | "lazy" =
     loading ?? (priority ? "eager" : "lazy");
+
+  const hasBookPage = typeof bookHref === "string" && bookHref.length > 0;
+  const hasAmazon = typeof amazonUrl === "string" && amazonUrl.length > 0;
+
+  // Si hay bookHref, construye /books/[id]#buy; si no, usa amazonUrl; si no hay nada, "#"
+  const href: string = hasBookPage
+    ? `${bookHref!}${sectionId ? `#${sectionId}` : ""}`
+    : hasAmazon
+    ? amazonUrl!
+    : "#";
+
+  // externo solo si vamos a Amazon (cuando no hay page interna)
+  const isExternal = !hasBookPage && hasAmazon;
 
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
@@ -43,7 +63,9 @@ const BookCard = ({
             placeholder="blur"
             blurDataURL={
               blurDataURL ?? "data:image/gif;base64,R0lGODlhAQABAAAAACw="
-            } // fallback 1x1
+            }
+            priority={priority}
+            loading={resolvedLoading}
           />
         </div>
 
@@ -55,15 +77,16 @@ const BookCard = ({
           </div>
 
           <Link
-            href={amazonUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={`Buy ${title} on Amazon`}
+            href={href}
+            {...(isExternal
+              ? { target: "_blank", rel: "noopener noreferrer" }
+              : {})}
+            aria-label={`Buy ${title}${isExternal ? " on Amazon" : ""}`}
             className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                        font-semibold px-6 py-3 text-lg transition-colors
                        text-center mt-4 hover:[text-decoration:none]"
           >
-            Buy Now
+            Available Oct 1st
           </Link>
         </div>
       </div>
