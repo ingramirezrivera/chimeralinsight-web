@@ -5,6 +5,7 @@ import { useRef, useEffect } from "react";
 import Image from "next/image";
 import BookCard from "./BookCard";
 import { books } from "@/data/books";
+import { withBasePath } from "@/lib/paths";
 
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -111,7 +112,7 @@ export default function BooksCarousel() {
             className="block w-64 md:w-96"
           >
             <Image
-              src="/images/amazon-logo.png"
+              src={withBasePath("/images/amazon-logo.png")}
               alt="Amazon Logo"
               width={384}
               height={96}

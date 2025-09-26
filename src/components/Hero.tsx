@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { withBasePath } from "@/lib/paths";
 
 interface HeroProps {
   imageUrl: string;
@@ -32,7 +33,7 @@ export default function Hero({
         {sealLogoUrl && sealLogoAltText && (
           <div className="p-2 bg-none bg-opacity-10 rounded-full shadow-xl">
             <Image
-              src={sealLogoUrl}
+              src={withBasePath(sealLogoUrl)}
               alt={sealLogoAltText}
               width={300}
               height={300}
@@ -45,7 +46,7 @@ export default function Hero({
           <div className="mt-4">
             <Image
               className="hover:scale-110 transition-transform duration-200 ease-in-out w-74 sm:w-150"
-              src="/logo.png"
+              src={withBasePath("/logo.png")}
               alt="Chimeralinsight logo"
               width={600}
               height={40}

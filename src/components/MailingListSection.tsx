@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { withBasePath } from "@/lib/paths";
 
 interface Props {
   title?: string;
@@ -64,7 +65,7 @@ export default function MailingListSection({
           {/* Imagen */}
           <div className="order-1 md:order-none flex justify-center md:justify-start">
             <Image
-              src="/images/paperplane.png"
+              src={withBasePath("/images/paperplane.png")}
               alt="Paper plane doodle"
               width={240}
               height={160}
