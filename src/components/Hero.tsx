@@ -16,40 +16,44 @@ export default function Hero({
   imageUrl,
   altText,
   sealLogoUrl,
-  sealLogoAltText,
+  sealLogoAltText = "Seal logo",
   mainLogoUrl,
-  mainLogoAltText,
+  mainLogoAltText = "Main logo",
 }: HeroProps) {
   return (
     <div
-      className="relative w-full h-120 md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2 font-sans"
-      style={{ backgroundImage: `url(${imageUrl})` }}
+      className="relative w-full h-[30rem] md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2 font-sans"
+      style={{ backgroundImage: `url(${withBasePath(imageUrl)})` }}
       aria-label={altText}
     >
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-[--brand]/20 to-transparent z-10"></div>
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-[--brand]/20 to-transparent z-10" />
 
       {/* Contenedor principal para ambos logos, apilados verticalmente */}
       <div className="relative z-20 flex flex-col items-center -translate-y-24">
-        {sealLogoUrl && sealLogoAltText && (
-          <div className="p-2 bg-none bg-opacity-10 rounded-full shadow-xl">
+        {/** Sello (opcional) */}
+        {sealLogoUrl && (
+          <div className="p-2 rounded-full shadow-xl">
             <Image
               src={withBasePath(sealLogoUrl)}
               alt={sealLogoAltText}
               width={300}
               height={300}
-              className="object-contain hover:scale-110 transition-transform duration-200 ease-in-out w-32 sm:w-76"
+              className="object-contain hover:scale-110 transition-transform duration-200 ease-in-out w-32 sm:w-72"
+              unoptimized
             />
           </div>
         )}
 
-        {mainLogoUrl && mainLogoAltText && (
+        {/** Logo principal (opcional) */}
+        {(mainLogoUrl || mainLogoAltText) && (
           <div className="mt-4">
             <Image
-              className="hover:scale-110 transition-transform duration-200 ease-in-out w-74 sm:w-150"
-              src={withBasePath("/logo.png")}
-              alt="Chimeralinsight logo"
+              src={withBasePath(mainLogoUrl ?? "/logo.png")}
+              alt={mainLogoAltText}
               width={600}
-              height={40}
+              height={120}
+              className="hover:scale-110 transition-transform duration-200 ease-in-out w-72 sm:w-[38rem] object-contain"
+              unoptimized
             />
           </div>
         )}
