@@ -39,14 +39,23 @@ export default function BooksCarousel() {
     i === mid || i === mid - 1 || i === mid + 1;
 
   return (
-    <div className="relative z-40 -mt-16 md:-mt-2 font-sans ">
-      <div className="relative text-white">
-        <div
-          className="absolute inset-0 -z-10 bg-[var(--brand)]"
-          style={{
-            clipPath: "polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%)",
-          }}
-        />
+    <div className="relative z-40 -mt-16 md:-mt-2 font-sans">
+      {/* Contenedor con fondo completo y wedge overlay (sin recortes) */}
+      <div className="relative text-white overflow-hidden">
+        {/* Fondo rectangular completo */}
+        <div className="absolute inset-0 -z-10 bg-[var(--brand)]" />
+
+        {/* Triángulo inferior como overlay. 
+            Usa el color EXACTO de la sección de abajo (aquí white). */}
+        <div className="pointer-events-none absolute inset-x-0 -bottom-px h-10 z-0">
+          <svg
+            viewBox="0 0 100 10"
+            preserveAspectRatio="none"
+            className="block w-full h-full"
+          >
+            <polygon points="0,0 100,0 50,10" fill="white" />
+          </svg>
+        </div>
 
         {/* Flechas (solo en mobile) */}
         <button
@@ -91,10 +100,12 @@ export default function BooksCarousel() {
               <div key={book.id} className="snap-center shrink-0 md:shrink">
                 <BookCard
                   title={book.title}
+                  // Si BookCard NO aplica withBasePath internamente, usa:
+                  // imageUrl={withBasePath(book.coverSrc)}
                   imageUrl={book.coverSrc}
-                  amazonUrl={book.amazonUrl ?? `/books/${book.id}#buy`} // fallback si algún día no tienes page
-                  bookHref={`/books/${book.id}`} // 👈 navega a la página del libro
-                  sectionId="buy" // 👈 salta a la sección #buy
+                  amazonUrl={book.amazonUrl ?? `/books/${book.id}#buy`}
+                  bookHref={`/books/${book.id}`}
+                  sectionId="buy"
                   priority={isPriority}
                   loading={imgLoading}
                 />
@@ -103,7 +114,7 @@ export default function BooksCarousel() {
           })}
         </div>
 
-        <div className="text-center -mt-16 md:mt-0 pb-10 flex flex-col items-center">
+        <div className="text-center -mt-16 md:mt-0 pb-10 flex flex-col items-center z-30 relative">
           <p className="text-3xl mb-4 text-white">Availables on:</p>
           <a
             href="https://www.amazon.com"

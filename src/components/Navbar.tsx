@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { useState, type MouseEvent } from "react";
 
 const links = [
+  { href: "/", label: "Home" },
   { href: "/#about", label: "About" },
   { href: "/#books", label: "Books" },
   { href: "/#mailing-list", label: "Mailing List" },
@@ -41,33 +42,52 @@ export default function Navbar() {
     return pathname === href || pathname.startsWith(href + "/");
   };
 
-  // Intercepta clics a anclas y hace scroll suave si estás en "/"
+  // Intercepta clics para scroll suave en Home (Home y anclas)
   const handleAnchorClick = (
     e: MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
-    const isAnchor = href.startsWith("#") || href.startsWith("/#");
-    const isHome = pathname === "/";
-    if (!isAnchor || !isHome) return; // deja que Next navegue si no estás en "/"
+    const onHome = pathname === "/";
 
-    e.preventDefault();
-    const id = href.replace("/#", "#");
-    const el = document.querySelector<HTMLElement>(id);
-    if (!el) return;
-
-    const HEADER_OFFSET = 96; // px
-    const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-    smoothScrollTo(y, 420);
-
+    // Cierra el menú móvil siempre
     setOpen(false);
-    history.replaceState(null, "", id); // actualiza hash sin salto
+
+    // 1) Clic en "Home" estando en Home -> scroll al tope
+    if (href === "/" && onHome) {
+      e.preventDefault();
+      smoothScrollTo(0, 420);
+      history.replaceState(null, "", "/");
+      return;
+    }
+
+    // 2) Clic en ancla (#... o /#...) estando en Home -> scroll a la sección
+    const isAnchor = href.startsWith("#") || href.startsWith("/#");
+    if (isAnchor && onHome) {
+      e.preventDefault();
+      const id = href.replace("/#", "#");
+      const el = document.querySelector<HTMLElement>(id);
+      if (!el) return;
+
+      const HEADER_OFFSET = 96; // ajusta a la altura real de tu navbar
+      const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
+
+      smoothScrollTo(y, 420);
+      history.replaceState(null, "", id);
+      return;
+    }
+
+    // 3) En cualquier otro caso, dejamos que Next navegue normalmente
   };
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--brand)] shadow-lg font-sans">
       <nav className="container mx-auto h-16 flex items-center justify-center px-10">
-        {/* Logo */}
-        <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
+        {/* Logo (usa el mismo handler para scroll suave cuando ya estás en Home) */}
+        <Link
+          href="/"
+          onClick={(e) => handleAnchorClick(e, "/")}
+          aria-current={isActive("/") ? "page" : undefined}
+        >
           <Image
             className="hover:scale-110 transition-transform duration-200 ease-in-out"
             src={`${bp}/images/logo.png`} // respeta /chimeralinsight-web en GitHub Pages
@@ -90,7 +110,7 @@ export default function Navbar() {
                   "inline-block px-3 py-2 text-lg font-medium text-white",
                   "no-underline hover:no-underline focus:no-underline",
                   "transition-transform duration-200 ease-in-out",
-                  "hover:text-[var(--brand-600)] hover:scale-110", // hover SIEMPRE
+                  "hover:text-[var(--brand-600)] hover:scale-110",
                   isActive(link.href) ? "text-[var(--accent)]" : "",
                 ].join(" ")}
               >

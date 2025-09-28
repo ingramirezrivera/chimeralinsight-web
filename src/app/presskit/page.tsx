@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { books } from "@/data/books";
+import { withBasePath } from "@/lib/paths"; // ✅ IMPORTANTE
 
 export const metadata: Metadata = {
   title: "Press Kit | Chimeralinsight",
@@ -38,10 +39,8 @@ function Section({
 }
 
 export default function PresskitPage() {
-  // Tipamos los libros que vienen del data
   const booksList = books as unknown as BookItem[];
 
-  // Biografía (ajusta el texto a tu copy real)
   const bioParagraphs: string[] = [
     "Robin C. Rickards es un autor enfocado en thrillers e ideas de alto impacto, combinando investigación rigurosa con narrativa ágil.",
     "Su trabajo explora la tensión entre ciencia, ética y poder, con especial atención a cómo la tecnología transforma la seguridad, la salud pública y la libertad individual.",
@@ -85,7 +84,7 @@ export default function PresskitPage() {
                   <div className="md:col-span-2">
                     <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-white ring-1 ring-black/5">
                       <Image
-                        src="/images/author-robin.png"
+                        src={withBasePath("/images/author-robin.png")} // ✅
                         alt="Author headshot"
                         fill
                         className="object-contain"
@@ -127,7 +126,7 @@ export default function PresskitPage() {
                         <div className="md:col-span-2">
                           <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden shadow-sm ring-1 ring-black/5 bg-white">
                             <Image
-                              src={b.coverSrc}
+                              src={withBasePath(b.coverSrc)} // ✅
                               alt={`${b.title} cover`}
                               fill
                               className="object-contain"
