@@ -7,7 +7,7 @@ import { withBasePath } from "@/lib/paths";
 
 export default function Home() {
   return (
-    <main>
+    <main id="top">
       <Hero
         imageUrl={withBasePath("/images/ChimInsightBanner.png")}
         altText="Imagen de fondo de un desierto con elementos de ciencia ficción y mitología"

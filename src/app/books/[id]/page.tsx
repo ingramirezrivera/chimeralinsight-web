@@ -81,7 +81,7 @@ export default async function BookPage({
             <div className="md:col-span-4">
               <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto rounded-xl overflow-hidden shadow-lg bg-white">
                 <Image
-                  src={book.coverSrc}
+                  src={withBasePath(book.coverSrc)}
                   alt={`${book.title} cover`}
                   fill
                   className="object-contain"
@@ -94,7 +94,9 @@ export default async function BookPage({
 
             {/* Texto */}
             <div className="md:col-span-8">
-              <p className="text-[#494949] font-medium tracking-wide">Book</p>
+              <p className="text-[#494949] font-large text-xl tracking-wide">
+                Book
+              </p>
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
                 {book.title}
               </h1>

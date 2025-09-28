@@ -18,8 +18,8 @@ export default function AboutAuthor({
 }: AboutAuthorProps) {
   return (
     <section id="about" className="relative py-16 bg-white font-sans">
-      <div className=" md:max-w-5xl mx-auto px-4">
-        <div className="relative ">
+      <div className="md:max-w-5xl mx-auto px-4">
+        <div className="relative">
           {/* GRID: foto 4/12, texto 8/12 */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-start">
             {/* Columna: Foto + Sello */}
@@ -93,9 +93,8 @@ export default function AboutAuthor({
 
               <div className="mt-6">
                 <Link
-                  href={"/#mailing-list"}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/#mailing-list" // ← navegación SPA al ancla en Home
+                  prefetch
                   className="w-full rounded-lg text-cyan-400 hover:bg-cyan-800 bg-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
                 >
                   chimeralinsight.com
