@@ -70,7 +70,7 @@ export default function Navbar() {
         <Link href="/" aria-current={isActive("/") ? "page" : undefined}>
           <Image
             className="hover:scale-110 transition-transform duration-200 ease-in-out"
-            src={`${bp}/logo.png`} // respeta /chimeralinsight-web en GitHub Pages
+            src={`${bp}/images/logo.png`} // respeta /chimeralinsight-web en GitHub Pages
             alt="Chimeralinsight logo"
             width={280}
             height={40}
