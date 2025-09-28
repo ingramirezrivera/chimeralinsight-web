@@ -94,16 +94,16 @@ export default async function BookPage({
 
             {/* Texto */}
             <div className="md:col-span-8">
-              <p className="text-neutral-500 font-medium tracking-wide">Book</p>
+              <p className="text-[#494949] font-medium tracking-wide">Book</p>
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
                 {book.title}
               </h1>
 
               {book.subtitle && (
-                <p className="mt-2 text-xl text-neutral-600">{book.subtitle}</p>
+                <p className="mt-2 text-xl text-[#494949]">{book.subtitle}</p>
               )}
 
-              <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed">
+              <div className="mt-5 space-y-4 text-[#494949] leading-relaxed">
                 {(content ?? "")
                   .split(/\n\s*\n/)
                   .map((para: string, i: number) => (

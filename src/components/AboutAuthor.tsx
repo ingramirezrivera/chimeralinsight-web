@@ -60,7 +60,7 @@ export default function AboutAuthor({
                 {name}
               </h1>
 
-              <div className="mt-5 space-y-4 text-neutral-700 leading-relaxed font-sans">
+              <div className="mt-5 space-y-4 text-[#494949] leading-relaxed font-sans">
                 <p>
                   Robin Rickards is a dual British-Canadian citizen with over 40
                   years of work in the medical field. He currently works

@@ -1,15 +1,13 @@
-// src/components/BooksSection.tsx
 "use client";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { books } from "@/data/books";
+import { books as defaultBooks } from "@/data/books";
 import { withBasePath } from "@/lib/paths";
 
 type Retailer = { id: string; label: string; url: string };
 
-// Define el shape mínimo que usas en la UI
 type Book = {
   id: string;
   title: string;
@@ -20,7 +18,17 @@ type Book = {
   retailers?: Retailer[];
 };
 
-// CTA reutilizable
+// ✅ Props nuevas
+type BooksSectionProps = {
+  title?: string; // título visible
+  items?: Book[]; // sobrescribe la fuente de datos (opcional)
+  id?: string; // id del <section> (para anchors)
+  className?: string; // clases extra
+  buyLabel?: string; // texto del botón de compra
+  learnMoreLabel?: string; // texto del botón “learn more”
+  background?: "teal" | "dark"; // variante de fondo
+};
+
 function CTA({
   href,
   children,
@@ -42,18 +50,15 @@ function CTA({
 }) {
   const base =
     "rounded-md px-4 py-2 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-2 no-underline";
-
   const display = fullWidth
     ? "flex w-full justify-center"
     : "inline-flex items-center justify-center";
-
   const variants =
     variant === "primary"
       ? "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600"
       : variant === "secondary"
       ? "bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-500"
-      : ""; // 'custom' -> sin colores por defecto
-
+      : "";
   const disabledClasses = isDisabled
     ? "pointer-events-none opacity-60 cursor-not-allowed"
     : "";
@@ -72,7 +77,6 @@ function CTA({
   );
 }
 
-// Modal con blur
 function RetailerModal({
   open,
   onClose,
@@ -155,21 +159,34 @@ function RetailerModal({
   );
 }
 
-export default function BooksSection() {
+export default function BooksSection({
+  title = "Books",
+  items,
+  id = "books",
+  className = "",
+  buyLabel = "Buy on Amazon",
+  learnMoreLabel = "Learn More …",
+  background = "teal",
+}: BooksSectionProps) {
   const [selected, setSelected] = useState<null | {
     title: string;
     retailers: Retailer[];
   }>(null);
 
+  const data = items ?? (defaultBooks as Book[]);
+
+  const bgClasses =
+    background === "teal" ? "bg-teal-800/70" : "bg-neutral-900/80";
+
   return (
-    <section id="books" className="w-full bg-teal-800/70 font-sans">
+    <section id={id} className={`w-full ${bgClasses} font-sans ${className}`}>
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10 md:py-16">
         <h2 className="text-4xl md:text-5xl font-medium text-white tracking-wide mb-8 md:mb-12">
-          Books
+          {title}
         </h2>
 
         <div className="space-y-12 md:space-y-16">
-          {(books as Book[]).map((b) => {
+          {data.map((b) => {
             const retailers: Retailer[] = b.retailers ?? [];
             const hasRetailers = retailers.length > 0;
 
@@ -192,24 +209,22 @@ export default function BooksSection() {
                       />
                     </div>
                   </div>
-
                   {/* Text */}
                   <div className="mt-5 md:mt-10 font-medium flex-1 text-white/95">
                     <h3 className="text-xl md:text-2xl">{b.title}</h3>
 
                     {b.subtitle && (
-                      <p className="mt-1 text-lg text-white/70">{b.subtitle}</p>
+                      <p className="mt-1 text-lg text-white/95">{b.subtitle}</p>
                     )}
 
                     {b.description && (
-                      <p className="mt-3 leading-relaxed text-white/90 md:pr-4">
+                      <p className="mt-3 leading-relaxed text-white/95">
                         {b.description}
                       </p>
                     )}
 
                     {/* Actions */}
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
-                      {/* Buy abre modal si hay retailers; si no, navega normal */}
                       <CTA
                         href={b.amazonUrl ?? "#"}
                         ariaLabel={`Buy ${b.title} on Amazon`}
@@ -218,22 +233,18 @@ export default function BooksSection() {
                         className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
                         onClick={
                           hasRetailers
-                            ? (e: React.MouseEvent<HTMLAnchorElement>) => {
+                            ? (e) => {
                                 e.preventDefault();
-                                setSelected({
-                                  title: b.title,
-                                  retailers,
-                                });
+                                setSelected({ title: b.title, retailers });
                               }
                             : undefined
                         }
                       >
-                        Buy on Amazon
+                        {buyLabel}
                       </CTA>
 
                       <span className="text-white/70 text-lg">or</span>
 
-                      {/* Learn More (gris) */}
                       <CTA
                         href={`/books/${b.id}`}
                         ariaLabel={`Learn more about ${b.title}`}
@@ -241,7 +252,7 @@ export default function BooksSection() {
                         fullWidth
                         className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
                       >
-                        Learn More …
+                        {learnMoreLabel}
                       </CTA>
                     </div>
                   </div>
