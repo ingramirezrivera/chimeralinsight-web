@@ -18,7 +18,7 @@ export default function Home() {
       />
       <BooksCarousel />
       <AboutAuthor photoUrl={withBasePath("/images/author-robin.png")} />
-      <BooksSection /> {/* ✅ sin props */}
+      <BooksSection id="books" title="Books" />
       <MailingListSection subscribeUrl="" />
     </main>
   );
