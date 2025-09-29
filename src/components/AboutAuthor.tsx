@@ -17,7 +17,7 @@ export default function AboutAuthor({
   sealUrl = "/images/robinr-logo.png",
 }: AboutAuthorProps) {
   return (
-    <section id="about" className="relative py-48 -mt-24 bg-white font-sans">
+    <section id="about" className="relative pt-48 -mt-24 bg-white font-sans">
       <div className="md:max-w-5xl mx-auto px-4">
         <div className="relative">
           {/* GRID: foto 4/12, texto 8/12 */}
@@ -91,11 +91,11 @@ export default function AboutAuthor({
                 </p>
               </div>
 
-              <div className="mt-6">
+              <div className="m-12">
                 <Link
                   href="/#mailing-list" // ← navegación SPA al ancla en Home
                   prefetch
-                  className="w-full rounded-lg text-cyan-400 hover:bg-cyan-800 bg-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
+                  className=" w-full rounded-lg text-cyan-400 hover:bg-cyan-800 bg-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
                 >
                   chimeralinsight.com
                 </Link>

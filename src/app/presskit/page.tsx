@@ -42,9 +42,10 @@ export default function PresskitPage() {
   const booksList = books as unknown as BookItem[];
 
   const bioParagraphs: string[] = [
-    "Robin C. Rickards es un autor enfocado en thrillers e ideas de alto impacto, combinando investigación rigurosa con narrativa ágil.",
-    "Su trabajo explora la tensión entre ciencia, ética y poder, con especial atención a cómo la tecnología transforma la seguridad, la salud pública y la libertad individual.",
-    "Actualmente desarrolla nuevos proyectos ambientados en escenarios contemporáneos, con personajes complejos y tramas que invitan a la reflexión.",
+    "Robin Rickards is a dual British-Canadian citizen with over 40 years of work in the medical field. He currently works part-time as an orthopedic surgeon, and lives with his beautiful Latina wife, four dogs and two cats—and sometimes a small weasel—near Vancouver, British Columbia. Robin speaks several languages but only one well (many may even dispute that!). ",
+    "Reading has been his passion and writing has always been his desire. Ideas for his books are derived from reality, past events and current events; all with a twist, all peppered with fact and all frighteningly believable.",
+    "Robin has five completed novels—each written in the “Thriller” genre. The sixth is on its way; the seventh and eighth novels are in the oven. He is a recipient of The Literary Titans Book Award 2025 for his novel Vaccine: A Terrorism Thriller.",
+    "Resurrected from the Dead: Robin has brought back to life his successful older website. Articles deal with subject matter in each of his novels and will be regularly updated. Please visit using the link below",
   ];
 
   return (
