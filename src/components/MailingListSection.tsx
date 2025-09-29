@@ -58,10 +58,10 @@ export default function MailingListSection({
   }
 
   return (
-    <section id="mailing-list" className="w-full bg-[#2f8185e8] font-sans">
-      <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-12 md:py-16">
+    <section id="mailing-list" className="w-full bg-[#2f8185e8] font-sans ">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-2 md:pt-8 pb-12">
         {/* ✅ Grid: 1 columna en mobile, 2 en md+ */}
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-8 md:gap-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-0 md:gap-8 md:gap-12 items-start">
           {/* Imagen */}
           <div className="order-1 md:order-none flex justify-center md:justify-start">
             <Image

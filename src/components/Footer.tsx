@@ -71,7 +71,7 @@ export default function Footer() {
       const el = document.querySelector<HTMLElement>(id);
       if (!el) return;
 
-      const HEADER_OFFSET = 96; // ajusta a la altura de tu navbar
+      const HEADER_OFFSET = 62; // ajusta a la altura de tu navbar
       const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
 
       smoothScrollTo(y, 420);

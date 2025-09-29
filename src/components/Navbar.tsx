@@ -3,8 +3,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type MouseEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -17,10 +17,7 @@ const links = [
 const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
 type SectionId = (typeof SECTION_IDS)[number];
 
-// altura del navbar (h-20 = 80px)
-const HEADER_OFFSET = 80;
-
-// scroll suave
+// Scroll suave
 const smoothScrollTo = (to: number, duration = 450) => {
   const start = window.scrollY || window.pageYOffset;
   const diff = to - start;
@@ -36,7 +33,19 @@ const smoothScrollTo = (to: number, duration = 450) => {
   requestAnimationFrame(step);
 };
 
+// Lee la altura del navbar (desde la CSS var o midiendo el <header>)
+const getNavHeight = () => {
+  const v = getComputedStyle(document.documentElement)
+    .getPropertyValue("--nav-h")
+    .trim();
+  const parsed = parseInt(v, 10);
+  if (Number.isFinite(parsed) && parsed > 0) return parsed;
+  const header = document.querySelector<HTMLElement>("header[data-nav='true']");
+  return header?.offsetHeight ?? 62; // fallback coherente con tu Footer
+};
+
 export default function Navbar() {
+  const router = useRouter();
   const rawPathname = usePathname();
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
   const pathname =
@@ -47,13 +56,37 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("top");
-  const bp = basePath;
 
-  // escuchar scroll SOLO en desktop (md+) para no mover mobile
+  // Referencia para medir el header y publicar --nav-h
+  const headerRef = useRef<HTMLElement>(null);
+
+  // Mide y publica la altura real del header
+  useEffect(() => {
+    const setVars = () => {
+      const h = headerRef.current?.offsetHeight ?? 62;
+      document.documentElement.style.setProperty("--nav-h", `${h}px`);
+    };
+    setVars();
+    window.addEventListener("resize", setVars);
+    window.addEventListener("load", setVars);
+    const t = setTimeout(setVars, 50); // por si el logo/fuente tarda
+    return () => {
+      window.removeEventListener("resize", setVars);
+      window.removeEventListener("load", setVars);
+      clearTimeout(t);
+    };
+  }, []);
+
+  // Re-medir cuando abres/cerras menú móvil
+  useEffect(() => {
+    const h = headerRef.current?.offsetHeight ?? 62;
+    document.documentElement.style.setProperty("--nav-h", `${h}px`);
+  }, [open]);
+
+  // Efecto de fondo al hacer scroll (solo desktop)
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
     const onScroll = () => setScrolled(window.scrollY > 8);
-
     const attach = () => {
       if (mql.matches) {
         onScroll();
@@ -63,7 +96,6 @@ export default function Navbar() {
         window.removeEventListener("scroll", onScroll);
       }
     };
-
     attach();
     mql.addEventListener("change", attach);
     return () => {
@@ -72,22 +104,19 @@ export default function Navbar() {
     };
   }, []);
 
-  // scroll-spy (marca sección activa)
+  // Scroll-spy usando altura real
   useEffect(() => {
     const any = SECTION_IDS.some((id) => document.getElementById(id));
     if (!any) return;
-
     const computeActive = () => {
-      const pos = window.scrollY + HEADER_OFFSET + 1;
+      const pos = window.scrollY + getNavHeight() + 1;
       let current: SectionId = "top";
       for (const id of SECTION_IDS) {
         const el = document.getElementById(id);
-        if (!el) continue;
-        if (el.offsetTop <= pos) current = id;
+        if (el && el.offsetTop <= pos) current = id;
       }
       setActiveSection(current);
     };
-
     computeActive();
     window.addEventListener("scroll", computeActive, { passive: true });
     window.addEventListener("resize", computeActive);
@@ -97,7 +126,7 @@ export default function Navbar() {
     };
   }, [pathname]);
 
-  // activo por ruta (páginas reales)
+  // Activo por ruta real
   const isRouteActive = (href: string) => {
     if (href.startsWith("/#")) return false;
     if (href === "/") return pathname === "/" ? activeSection === "top" : false;
@@ -105,7 +134,7 @@ export default function Navbar() {
     return pathname === base || pathname.startsWith(base + "/");
   };
 
-  // activo por sección (home)
+  // Activo por sección (home)
   const isSectionActive = (href: string) => {
     if (href === "/") return activeSection === "top";
     if (href.startsWith("/#"))
@@ -127,6 +156,7 @@ export default function Navbar() {
     );
   };
 
+  // Click en enlaces (manejo de anclas con offset dinámico)
   const handleAnchorClick = (
     e: MouseEvent<HTMLAnchorElement>,
     href: string
@@ -134,40 +164,60 @@ export default function Navbar() {
     const onHome = pathname === "/";
     setOpen(false);
 
+    // Click en Home estando en Home → scroll top suave
     if (href === "/" && onHome) {
       e.preventDefault();
       smoothScrollTo(0, 420);
       history.replaceState(null, "", "/");
       return;
     }
+
     const isAnchor = href.startsWith("#") || href.startsWith("/#");
-    if (isAnchor && onHome) {
+    if (isAnchor) {
       e.preventDefault();
-      const id = href.replace("/#", "#");
-      const el = document.querySelector<HTMLElement>(id);
-      if (!el) return;
-      const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-      smoothScrollTo(y, 420);
-      history.replaceState(null, "", id);
+      const hash = href.replace("/#", "#");
+
+      if (onHome) {
+        // Ya en Home: medir después de cerrar menú y desplazar
+        requestAnimationFrame(() => {
+          const el = document.querySelector<HTMLElement>(hash);
+          if (!el) return;
+          const y =
+            el.getBoundingClientRect().top + window.scrollY - getNavHeight();
+          smoothScrollTo(y, 420);
+          history.replaceState(null, "", hash);
+        });
+      } else {
+        // Viniendo de otra ruta: navegar y ajustar al pintar
+        router.push("/" + hash);
+        setTimeout(() => {
+          const el = document.querySelector<HTMLElement>(hash);
+          if (!el) return;
+          const y =
+            el.getBoundingClientRect().top + window.scrollY - getNavHeight();
+          window.scrollTo(0, y);
+        }, 0);
+      }
+      return;
     }
+
+    // Rutas reales (páginas) → dejar que Next navegue normal
   };
 
   return (
     <>
-      {/* Cambiado de 'fixed' a 'sticky' para una mejor experiencia móvil */}
       <header
+        ref={headerRef}
+        data-nav="true"
         className={[
           "sticky top-0 left-0 right-0 z-50 font-sans",
           "bg-[var(--brand,#0f766e)]",
           "md:transition md:duration-300",
-          "md:bg-[var(--brand,#0f766e)]",
-          // Agregamos efectos de scroll solo para desktop para no afectar mobile
           scrolled
             ? "md:bg-[var(--brand,#0f766e)]/80 md:backdrop-blur md:shadow-md"
             : "md:bg-[var(--brand,#0f766e)] md:shadow-lg",
         ].join(" ")}
       >
-        {/* altura constante en ambos breakpoints */}
         <nav className="container mx-auto h-20 md:h-14 flex items-center justify-between md:justify-center px-4 md:px-10">
           {/* LOGO */}
           <Link
@@ -179,7 +229,7 @@ export default function Navbar() {
             className="shrink-0"
           >
             <Image
-              src={`${bp}/images/logo.png`}
+              src={`${basePath}/images/logo.png`}
               alt="Chimeralinsight logo"
               width={340}
               height={60}
@@ -261,7 +311,6 @@ export default function Navbar() {
           </div>
         )}
       </header>
-      {/* El div espaciador ya no es necesario con 'sticky' */}
     </>
   );
 }
