@@ -164,7 +164,7 @@ html {
   }
 
   p {
-    @apply leading-7 text-gray-600 dark:text-gray-300;
+    @apply leading-7 text-gray-900;
   }
 
   /* Links use brand variables (not Tailwind emerald) */
