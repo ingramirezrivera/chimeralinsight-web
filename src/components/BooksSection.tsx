@@ -198,7 +198,7 @@ export default function BooksSection({
                 <div className="flex flex-col md:flex-row md:items-start md:gap-8">
                   {/* Cover */}
                   <div className="mx-auto md:mx-0 shrink-0">
-                    <div className="relative h-96 w-64 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
+                    <div className="relative h-96 w-60 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
                       <Image
                         src={withBasePath(b.coverSrc)}
                         alt={`${b.title} cover`}
