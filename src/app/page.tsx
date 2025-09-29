@@ -9,7 +9,7 @@ import { withBasePath } from "@/lib/paths";
 export default function Home() {
   return (
     <main id="top">
-      <section id="home" className="scroll-mt-24">
+      <section id="home">
         <Hero
           imageUrl={withBasePath("/images/ChimInsightBanner.png")}
           altText="Imagen de fondo de un desierto con elementos de ciencia ficción y mitología"
@@ -22,18 +22,15 @@ export default function Home() {
 
       <BooksCarousel />
 
-      {/* 👇 Ancla About */}
-      <section id="about" className="scroll-mt-24">
+      <section id="about">
         <AboutAuthor photoUrl={withBasePath("/images/author-robin.png")} />
       </section>
 
-      {/* 👇 Ancla Books */}
-      <section id="books" className="scroll-mt-24">
+      <section id="books">
         <BooksSection />
       </section>
 
-      {/* 👇 Ancla Mailing List */}
-      <section id="mailing-list" className="scroll-mt-24">
+      <section id="mailing-list">
         <MailingListSection subscribeUrl="" />
       </section>
     </main>
