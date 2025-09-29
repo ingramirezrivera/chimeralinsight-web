@@ -17,7 +17,7 @@ export default function AboutAuthor({
   sealUrl = "/images/robinr-logo.png",
 }: AboutAuthorProps) {
   return (
-    <section id="about" className="relative pt-24 -mt-24 bg-white font-sans">
+    <section id="about" className="relative py-32 -mt-24 bg-white font-sans">
       <div className="md:max-w-5xl mx-auto px-2">
         <div className="relative">
           {/* GRID: foto 4/12, texto 8/12 */}
@@ -91,7 +91,7 @@ export default function AboutAuthor({
                 </p>
               </div>
 
-              <div className="mt-12 mb-12 items-center justify-center">
+              <div className="mt-12 mb-12 flex justify-center">
                 <Link
                   href="/#mailing-list" // ← navegación SPA al ancla en Home
                   prefetch

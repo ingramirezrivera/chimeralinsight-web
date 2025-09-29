@@ -79,7 +79,7 @@ export default async function BookPage({
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-2 md:p-10 items-start rounded-2xl ">
             {/* Portada (completa, sin recortar) */}
             <div className="md:col-span-4">
-              <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto rounded-xl overflow-hidden shadow-lg bg-transparent">
+              <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto overflow-hidden">
                 <Image
                   src={withBasePath(book.coverSrc)}
                   alt={`${book.title} cover`}

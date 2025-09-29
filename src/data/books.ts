@@ -22,7 +22,7 @@ export const books: BookData[] = [
     title: "The Tao of The Thirteenth God",
     subtitle: "A Paranormal Thriller",
     description:
-      "They all drank the Kool-Aid and one thousand people died. Amadeus and Theo Savoie are twins, estranged for years...",
+      "They all drank the Kool-Aid and one thousand people died. Amadeus and Theo Savoie are twins, estranged for years, the products of a childhood torn apart by religion, abandonment and suicide. With his partner, Dr. Angelica Pali, Amadeus sifts through a maze of religious rituals with all signs pointing to the convergence of a religious and...",
     coverSrc: "/images/books/the-tao-of-the-thirteenth-good.jpg",
     amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
     retailers: [
@@ -53,10 +53,9 @@ Superstition, coded messages and drug induced visions of the dead, combine to cr
   {
     id: "vaccine",
     title: "Vaccine: A Terrorism Thriller",
-    subtitle:
-      "War kills in many ways—with speed, with brutality...with stealth.",
+    subtitle: "",
     description:
-      "At the end of the 20th century, America prepares for a war that could transform the world...",
+      "War kills in many ways—with speed, with brutality…with stealth. At the end of the 20th century, America prepares for a war that could transform the world. But that war has already been fought. . .and America has lost. In the lingering chaos of the Middle East conflict, a pathogen is unleashed. This plague has been engineered to suffocate its...",
     coverSrc: "/images/books/vaccine.jpg",
     amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
     retailers: [
@@ -87,7 +86,7 @@ Blackmail, bioterror, deception—an electrifying terrorism thriller that merges
     title: "Whip The Dogs",
     subtitle: "An Addiction Thriller",
     description:
-      "The weapons of war are always changing. Clandestine research has created UNNATURAL BORN KILLERS...",
+      "The Weapons of War are Always Changing. In the real world, clandestine scientific research has already created UNNATURAL BORN KILLERS, super soldiers, genetically modified killing machines. In America, Dr. Michael Andross had been unknowingly used as the seed for genetic research. Today, he is a narcotics addict and each day of his life, he is...",
     coverSrc: "/images/books/whip-the-dogs.jpg",
     amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
     retailers: [
