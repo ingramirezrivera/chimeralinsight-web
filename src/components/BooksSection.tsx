@@ -226,6 +226,15 @@ export default function BooksSection({
                     {/* Actions */}
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
                       <CTA
+                        href={`/books/${b.id}`}
+                        ariaLabel={`Learn more about ${b.title}`}
+                        variant="custom"
+                        fullWidth
+                        className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
+                      >
+                        {learnMoreLabel}
+                      </CTA>
+                      <CTA
                         href={b.amazonUrl ?? "#"}
                         ariaLabel={`Buy ${b.title} on Amazon`}
                         variant="custom"
@@ -241,18 +250,6 @@ export default function BooksSection({
                         }
                       >
                         {buyLabel}
-                      </CTA>
-
-                      <span className="text-white/70 text-lg">or</span>
-
-                      <CTA
-                        href={`/books/${b.id}`}
-                        ariaLabel={`Learn more about ${b.title}`}
-                        variant="custom"
-                        fullWidth
-                        className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
-                      >
-                        {learnMoreLabel}
                       </CTA>
                     </div>
                   </div>

@@ -233,7 +233,7 @@ export default function Navbar() {
               alt="Chimeralinsight logo"
               width={340}
               height={60}
-              className="h-auto w-[260px] md:w-[320px] transition-transform duration-200 ease-in-out hover:scale-110"
+              className="h-auto w-64 md:w-64 transition-transform duration-200 ease-in-out hover:scale-110"
               priority
             />
           </Link>
