@@ -82,7 +82,7 @@ export default async function BookPage({
       </header>
 
       {/* Cuerpo */}
-      <section className="relative py-16 bg-white">
+      <section className="relative py-2 md:py-1 bg-white">
         <div className="container mx-auto px-4 md:max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-2 md:p-10 items-start rounded-2xl ">
             {/* Portada (completa, sin recortar) */}
@@ -119,14 +119,14 @@ export default async function BookPage({
                   ))}
               </div>
 
-              <div className="mt-8 flex flex-wrap items-center gap-3">
+              <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-3">
                 {/* Abre modal si hay retailers; si no, usa href */}
                 <BuyRetailerModalButton
                   title={book.title}
                   retailers={retailers}
                   href={extras.amazonUrl}
                   ariaLabel={`Buy ${book.title} on Amazon`}
-                  className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
+                  className="rounded-lg bg-cyan-400 hover:bg-cyan-300 w-48 text-center text-teal-900
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
                 >
                   Buy on Amazon
@@ -135,7 +135,7 @@ export default async function BookPage({
                 {/* ⬇️ Ajuste puntual: Link con basePath */}
                 <Link
                   href={withBasePath("/#books")}
-                  className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white
+                  className="rounded-lg bg-gray-700/70 w-48 text-center hover:bg-gray-600 text-white
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
                 >
                   Back to Books

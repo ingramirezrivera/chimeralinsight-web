@@ -117,7 +117,7 @@ function RetailerModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-teal-600 text-white shadow-2xl">
+      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-[var(--brand)] text-white shadow-2xl">
         <div className="flex items-start justify-between p-6">
           <h2
             id="retailer-title"
@@ -140,7 +140,7 @@ function RetailerModal({
           </p>
         )}
 
-        <div className="px-6 pb-6 flex flex-wrap items-center justify-center gap-4">
+        <div className="px-6 pb-6 flex flex-wrap justify-center gap-4">
           {retailers.map((r, i) => (
             <a
               key={r.id}
@@ -148,7 +148,7 @@ function RetailerModal({
               ref={i === 0 ? firstBtnRef : undefined}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition no-underline"
+              className="w-48 inline-flex items-center justify-center rounded-md bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition no-underline"
             >
               {r.label}
             </a>
@@ -226,15 +226,6 @@ export default function BooksSection({
                     {/* Actions */}
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
                       <CTA
-                        href={`/books/${b.id}`}
-                        ariaLabel={`Learn more about ${b.title}`}
-                        variant="custom"
-                        fullWidth
-                        className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
-                      >
-                        {learnMoreLabel}
-                      </CTA>
-                      <CTA
                         href={b.amazonUrl ?? "#"}
                         ariaLabel={`Buy ${b.title} on Amazon`}
                         variant="custom"
@@ -250,6 +241,15 @@ export default function BooksSection({
                         }
                       >
                         {buyLabel}
+                      </CTA>
+                      <CTA
+                        href={`/books/${b.id}`}
+                        ariaLabel={`Learn more about ${b.title}`}
+                        variant="custom"
+                        fullWidth
+                        className="rounded-lg bg-gray-700/50 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
+                      >
+                        {learnMoreLabel}
                       </CTA>
                     </div>
                   </div>
