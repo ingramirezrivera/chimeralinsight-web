@@ -60,7 +60,7 @@ export default async function BookPage({
   return (
     <main className="font-sans">
       {/* Cabecera simple */}
-      <header className="bg-[var(--brand)] text-white shadow">
+      <header className="bg-[var(--brand)] bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
           <Link href="/" className="no-underline hover:no-underline">
             <span className="text-lg font-semibold hover:opacity-90">
@@ -76,7 +76,7 @@ export default async function BookPage({
       {/* Cuerpo */}
       <section className="relative py-16 bg-white">
         <div className="container mx-auto px-4 md:max-w-5xl">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-start rounded-2xl bg-teal-50">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-2 md:p-10 items-start rounded-2xl ">
             {/* Portada (completa, sin recortar) */}
             <div className="md:col-span-4">
               <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto rounded-xl overflow-hidden shadow-lg bg-white">
@@ -94,9 +94,7 @@ export default async function BookPage({
 
             {/* Texto */}
             <div className="md:col-span-8">
-              <p className="text-[#494949] font-large text-xl tracking-wide">
-                Book
-              </p>
+              <p className="text-[#494949] font-large tracking-wide">Book</p>
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
                 {book.title}
               </h1>

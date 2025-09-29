@@ -17,11 +17,11 @@ export default function AboutAuthor({
   sealUrl = "/images/robinr-logo.png",
 }: AboutAuthorProps) {
   return (
-    <section id="about" className="relative pt-48 -mt-24 bg-white font-sans">
-      <div className="md:max-w-5xl mx-auto px-4">
+    <section id="about" className="relative pt-24 -mt-24 bg-white font-sans">
+      <div className="md:max-w-5xl mx-auto px-2">
         <div className="relative">
           {/* GRID: foto 4/12, texto 8/12 */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-6 md:p-10 items-start">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-2 md:p-10 items-start">
             {/* Columna: Foto + Sello */}
             <div className="md:col-span-4 row-start-2 md:row-auto">
               {/* Foto */}
@@ -91,7 +91,7 @@ export default function AboutAuthor({
                 </p>
               </div>
 
-              <div className="m-12">
+              <div className="mt-12 mb-12 items-center justify-center">
                 <Link
                   href="/#mailing-list" // ← navegación SPA al ancla en Home
                   prefetch
