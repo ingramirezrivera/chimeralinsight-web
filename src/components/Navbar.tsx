@@ -17,7 +17,7 @@ const links = [
 const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
 type SectionId = (typeof SECTION_IDS)[number];
 
-// ↑ altura del navbar en mobile (h-20 = 80px)
+// altura del navbar (h-20 = 80px)
 const HEADER_OFFSET = 80;
 
 // scroll suave
@@ -45,11 +45,11 @@ export default function Navbar() {
       : rawPathname;
 
   const [open, setOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false); // solo desktop
+  const [scrolled, setScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>("top");
   const bp = basePath;
 
-  // ✅ escuchar scroll SOLO en desktop (md+) para no mover mobile
+  // escuchar scroll SOLO en desktop (md+) para no mover mobile
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 768px)");
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -153,91 +153,45 @@ export default function Navbar() {
   };
 
   return (
-    <header
-      className={[
-        // 👇 STICKY también en mobile (ya no fixed)
-        "fixed md:sticky top-0 left-0 right-0 z-50 font-sans",
-        "bg-[var(--brand,#0f766e)]",
-        // efecto de transparencia solo en desktop
-        "md:transition md:duration-300",
-        scrolled
-          ? "md:bg-[var(--brand,#0f766e)]/80 md:backdrop-blur md:shadow-md"
-          : "md:bg-[var(--brand,#0f766e)] md:shadow-lg",
-      ].join(" ")}
-    >
-      {/* altura mobile ↑ a h-14; desktop h-14 también */}
-      <nav className="container mx-auto h-14 md:h-14 flex items-center justify-between md:justify-center px-4 md:px-10">
-        {/* LOGO más grande en mobile */}
-        <Link
-          href="/"
-          onClick={(e) => handleAnchorClick(e, "/")}
-          aria-current={
-            isRouteActive("/") || isSectionActive("/") ? "page" : undefined
-          }
-          className="shrink-0"
-        >
-          <Image
-            src={`${bp}/images/logo.png`}
-            alt="Chimeralinsight logo"
-            width={340}
-            height={60}
-            className="h-auto w-[260px] md:w-[320px] transition-transform duration-200 ease-in-out hover:scale-110"
-            priority
-          />
-        </Link>
-
-        {/* Desktop links */}
-        <ul className="hidden md:flex items-center gap-8 pl-10">
-          {links.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={(e) => handleAnchorClick(e, link.href)}
-                aria-current={
-                  isRouteActive(link.href) || isSectionActive(link.href)
-                    ? "page"
-                    : undefined
-                }
-                className={linkClasses(link.href)}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
-
-        {/* Botón móvil */}
-        <button
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600,#0891b2)]"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Toggle menu"
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-        >
-          <svg
-            className="w-8 h-8"
-            viewBox="0 0 24 24"
-            fill="none"
-            aria-hidden="true"
+    <>
+      {/* Cambiado de 'fixed' a 'sticky' para una mejor experiencia móvil */}
+      <header
+        className={[
+          "sticky top-0 left-0 right-0 z-50 font-sans",
+          "bg-[var(--brand,#0f766e)]",
+          "md:transition md:duration-300",
+          "md:bg-[var(--brand,#0f766e)]",
+          // Agregamos efectos de scroll solo para desktop para no afectar mobile
+          scrolled
+            ? "md:bg-[var(--brand,#0f766e)]/80 md:backdrop-blur md:shadow-md"
+            : "md:bg-[var(--brand,#0f766e)] md:shadow-lg",
+        ].join(" ")}
+      >
+        {/* altura constante en ambos breakpoints */}
+        <nav className="container mx-auto h-20 md:h-14 flex items-center justify-between md:justify-center px-4 md:px-10">
+          {/* LOGO */}
+          <Link
+            href="/"
+            onClick={(e) => handleAnchorClick(e, "/")}
+            aria-current={
+              isRouteActive("/") || isSectionActive("/") ? "page" : undefined
+            }
+            className="shrink-0"
           >
-            <path
-              d="M4 6h16M4 12h16M4 18h16"
-              stroke="currentColor"
-              strokeWidth="2"
+            <Image
+              src={`${bp}/images/logo.png`}
+              alt="Chimeralinsight logo"
+              width={340}
+              height={60}
+              className="h-auto w-[260px] md:w-[320px] transition-transform duration-200 ease-in-out hover:scale-110"
+              priority
             />
-          </svg>
-        </button>
-      </nav>
+          </Link>
 
-      {/* Menú móvil */}
-      {open && (
-        <div
-          id="mobile-menu"
-          className="md:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
-        >
-          <ul className="divide-y divide-[var(--brand-600,#0891b2)]">
+          {/* Desktop links */}
+          <ul className="hidden md:flex items-center gap-8 pl-10">
             {links.map((link) => (
-              <li key={link.href} className="text-center">
+              <li key={link.href}>
                 <Link
                   href={link.href}
                   onClick={(e) => handleAnchorClick(e, link.href)}
@@ -246,18 +200,68 @@ export default function Navbar() {
                       ? "page"
                       : undefined
                   }
-                  className={[
-                    "block w-full px-6 py-4 text-base font-medium no-underline hover:no-underline focus:no-underline transition duration-200 ease-in-out",
-                    linkClasses(link.href),
-                  ].join(" ")}
+                  className={linkClasses(link.href)}
                 >
                   {link.label}
                 </Link>
               </li>
             ))}
           </ul>
-        </div>
-      )}
-    </header>
+
+          {/* Botón móvil */}
+          <button
+            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600,#0891b2)]"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Toggle menu"
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+          >
+            <svg
+              className="w-8 h-8"
+              viewBox="0 0 24 24"
+              fill="none"
+              aria-hidden="true"
+            >
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="currentColor"
+                strokeWidth="2"
+              />
+            </svg>
+          </button>
+        </nav>
+
+        {/* Menú móvil */}
+        {open && (
+          <div
+            id="mobile-menu"
+            className="md:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
+          >
+            <ul className="divide-y divide-[var(--brand-600,#0891b2)]">
+              {links.map((link) => (
+                <li key={link.href} className="text-center">
+                  <Link
+                    href={link.href}
+                    onClick={(e) => handleAnchorClick(e, link.href)}
+                    aria-current={
+                      isRouteActive(link.href) || isSectionActive(link.href)
+                        ? "page"
+                        : undefined
+                    }
+                    className={[
+                      "block w-full px-6 py-4 text-base font-medium no-underline hover:no-underline focus:no-underline transition duration-200 ease-in-out",
+                      linkClasses(link.href),
+                    ].join(" ")}
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </header>
+      {/* El div espaciador ya no es necesario con 'sticky' */}
+    </>
   );
 }
