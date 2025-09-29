@@ -35,7 +35,8 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    alternates: { canonical: `/books/${book.id}` },
+    // ⬇️ Ajuste puntual: usar basePath para canonical
+    alternates: { canonical: withBasePath(`/books/${book.id}`) },
   };
 }
 
@@ -62,12 +63,19 @@ export default async function BookPage({
       {/* Cabecera simple */}
       <header className="bg-[var(--brand)] bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          <Link href="/" className="no-underline hover:no-underline">
+          {/* ⬇️ Ajuste puntual: Links con basePath */}
+          <Link
+            href={withBasePath("/")}
+            className="no-underline hover:no-underline"
+          >
             <span className="text-lg font-semibold hover:opacity-90">
               ← Back to Home
             </span>
           </Link>
-          <Link href="/#books" className="underline hover:opacity-90">
+          <Link
+            href={withBasePath("/#books")}
+            className="underline hover:opacity-90"
+          >
             All Books
           </Link>
         </div>
@@ -124,8 +132,9 @@ export default async function BookPage({
                   Buy on Amazon
                 </BuyRetailerModalButton>
 
+                {/* ⬇️ Ajuste puntual: Link con basePath */}
                 <Link
-                  href="/#books"
+                  href={withBasePath("/#books")}
                   className="rounded-lg bg-gray-700 hover:bg-gray-600 text-white
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
                 >
