@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Roboto_Condensed } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar"; // Importamos el Navbar aquí
@@ -9,6 +9,12 @@ const robotoCondensed = Roboto_Condensed({
   weight: ["300", "400", "700"],
   variable: "--font-roboto",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   title: "Chimeralinsight",
