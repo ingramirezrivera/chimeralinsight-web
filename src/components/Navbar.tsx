@@ -4,7 +4,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 
 const links = [
   { href: "/", label: "Home" },
@@ -14,16 +14,22 @@ const links = [
   { href: "/presskit", label: "Presskit" },
 ];
 
-// Easing y scroll con duración controlada
+const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
+type SectionId = (typeof SECTION_IDS)[number];
+
+// ↑ altura del navbar en mobile (h-20 = 80px)
+const HEADER_OFFSET = 80;
+
+// scroll suave
 const smoothScrollTo = (to: number, duration = 450) => {
   const start = window.scrollY || window.pageYOffset;
   const diff = to - start;
-  let startTime: number | null = null;
+  let t0: number | null = null;
   const ease = (t: number) =>
     t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
   const step = (ts: number) => {
-    if (startTime === null) startTime = ts;
-    const p = Math.min((ts - startTime) / duration, 1);
+    if (t0 === null) t0 = ts;
+    const p = Math.min((ts - t0) / duration, 1);
     window.scrollTo(0, start + diff * ease(p));
     if (p < 1) requestAnimationFrame(step);
   };
@@ -31,69 +37,151 @@ const smoothScrollTo = (to: number, duration = 450) => {
 };
 
 export default function Navbar() {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const bp = process.env.NEXT_PUBLIC_BASE_PATH ?? ""; // basePath público (Pages)
+  const rawPathname = usePathname();
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+  const pathname =
+    basePath && rawPathname.startsWith(basePath)
+      ? rawPathname.slice(basePath.length) || "/"
+      : rawPathname;
 
-  // No marcamos anclas como "active" para que el hover funcione en home
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false); // solo desktop
+  const [activeSection, setActiveSection] = useState<SectionId>("top");
+  const bp = basePath;
+
+  // ✅ escuchar scroll SOLO en desktop (md+) para no mover mobile
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const onScroll = () => setScrolled(window.scrollY > 8);
+
+    const attach = () => {
+      if (mql.matches) {
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+      } else {
+        setScrolled(false);
+        window.removeEventListener("scroll", onScroll);
+      }
+    };
+
+    attach();
+    mql.addEventListener("change", attach);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      mql.removeEventListener("change", attach);
+    };
+  }, []);
+
+  // scroll-spy (marca sección activa)
+  useEffect(() => {
+    const any = SECTION_IDS.some((id) => document.getElementById(id));
+    if (!any) return;
+
+    const computeActive = () => {
+      const pos = window.scrollY + HEADER_OFFSET + 1;
+      let current: SectionId = "top";
+      for (const id of SECTION_IDS) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.offsetTop <= pos) current = id;
+      }
+      setActiveSection(current);
+    };
+
+    computeActive();
+    window.addEventListener("scroll", computeActive, { passive: true });
+    window.addEventListener("resize", computeActive);
+    return () => {
+      window.removeEventListener("scroll", computeActive);
+      window.removeEventListener("resize", computeActive);
+    };
+  }, [pathname]);
+
+  // activo por ruta (páginas reales)
+  const isRouteActive = (href: string) => {
     if (href.startsWith("/#")) return false;
-    return pathname === href || pathname.startsWith(href + "/");
+    if (href === "/") return pathname === "/" ? activeSection === "top" : false;
+    const base = href.split("#")[0];
+    return pathname === base || pathname.startsWith(base + "/");
   };
 
-  // Intercepta clics para scroll suave en Home (Home y anclas)
+  // activo por sección (home)
+  const isSectionActive = (href: string) => {
+    if (href === "/") return activeSection === "top";
+    if (href.startsWith("/#"))
+      return activeSection === (href.slice(2) as SectionId);
+    return false;
+  };
+
+  const linkClasses = (href: string) => {
+    const active = isRouteActive(href) || isSectionActive(href);
+    const base =
+      "inline-block px-3 py-2 font-medium no-underline focus:no-underline transition duration-200 ease-in-out hover:scale-110";
+    const baseColor = scrolled ? "text-white/90" : "text-white";
+    const hoverColor = scrolled
+      ? "hover:text-white"
+      : "hover:text-[var(--brand-600,#0891b2)]";
+    const activeColor = "text-[var(--accent,#fbbf24)] hover:opacity-90";
+    return [base, active ? activeColor : `${baseColor} ${hoverColor}`].join(
+      " "
+    );
+  };
+
   const handleAnchorClick = (
     e: MouseEvent<HTMLAnchorElement>,
     href: string
   ) => {
     const onHome = pathname === "/";
-
-    // Cierra el menú móvil siempre
     setOpen(false);
 
-    // 1) Clic en "Home" estando en Home -> scroll al tope
     if (href === "/" && onHome) {
       e.preventDefault();
       smoothScrollTo(0, 420);
       history.replaceState(null, "", "/");
       return;
     }
-
-    // 2) Clic en ancla (#... o /#...) estando en Home -> scroll a la sección
     const isAnchor = href.startsWith("#") || href.startsWith("/#");
     if (isAnchor && onHome) {
       e.preventDefault();
       const id = href.replace("/#", "#");
       const el = document.querySelector<HTMLElement>(id);
       if (!el) return;
-
-      const HEADER_OFFSET = 96; // ajusta a la altura real de tu navbar
       const y = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
-
       smoothScrollTo(y, 420);
       history.replaceState(null, "", id);
-      return;
     }
-
-    // 3) En cualquier otro caso, dejamos que Next navegue normalmente
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-[var(--brand)] shadow-lg font-sans">
-      <nav className="container mx-auto h-16 flex items-center justify-center px-10">
-        {/* Logo (usa el mismo handler para scroll suave cuando ya estás en Home) */}
+    <header
+      className={[
+        // 👇 STICKY también en mobile (ya no fixed)
+        "fixed md:sticky top-0 left-0 right-0 z-50 font-sans",
+        "bg-[var(--brand,#0f766e)]",
+        // efecto de transparencia solo en desktop
+        "md:transition md:duration-300",
+        scrolled
+          ? "md:bg-[var(--brand,#0f766e)]/80 md:backdrop-blur md:shadow-md"
+          : "md:bg-[var(--brand,#0f766e)] md:shadow-lg",
+      ].join(" ")}
+    >
+      {/* altura mobile ↑ a h-14; desktop h-14 también */}
+      <nav className="container mx-auto h-14 md:h-14 flex items-center justify-between md:justify-center px-4 md:px-10">
+        {/* LOGO más grande en mobile */}
         <Link
           href="/"
           onClick={(e) => handleAnchorClick(e, "/")}
-          aria-current={isActive("/") ? "page" : undefined}
+          aria-current={
+            isRouteActive("/") || isSectionActive("/") ? "page" : undefined
+          }
+          className="shrink-0"
         >
           <Image
-            className="hover:scale-110 transition-transform duration-200 ease-in-out"
-            src={`${bp}/images/logo.png`} // respeta /chimeralinsight-web en GitHub Pages
+            src={`${bp}/images/logo.png`}
             alt="Chimeralinsight logo"
-            width={280}
-            height={40}
+            width={340}
+            height={60}
+            className="h-auto w-[260px] md:w-[320px] transition-transform duration-200 ease-in-out hover:scale-110"
             priority
           />
         </Link>
@@ -105,14 +193,12 @@ export default function Navbar() {
               <Link
                 href={link.href}
                 onClick={(e) => handleAnchorClick(e, link.href)}
-                aria-current={isActive(link.href) ? "page" : undefined}
-                className={[
-                  "inline-block px-3 py-2 text-lg font-medium text-white",
-                  "no-underline hover:no-underline focus:no-underline",
-                  "transition-transform duration-200 ease-in-out",
-                  "hover:text-[var(--brand-600)] hover:scale-110",
-                  isActive(link.href) ? "text-[var(--accent)]" : "",
-                ].join(" ")}
+                aria-current={
+                  isRouteActive(link.href) || isSectionActive(link.href)
+                    ? "page"
+                    : undefined
+                }
+                className={linkClasses(link.href)}
               >
                 {link.label}
               </Link>
@@ -120,9 +206,9 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Mobile hamburger */}
+        {/* Botón móvil */}
         <button
-          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600)]"
+          className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600,#0891b2)]"
           onClick={() => setOpen((v) => !v)}
           aria-label="Toggle menu"
           aria-expanded={open}
@@ -143,24 +229,26 @@ export default function Navbar() {
         </button>
       </nav>
 
-      {/* Mobile menu */}
+      {/* Menú móvil */}
       {open && (
         <div
           id="mobile-menu"
-          className="md:hidden border-t border-[var(--brand-600)] bg-[var(--brand)]"
+          className="md:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
         >
-          <ul className="divide-y divide-[var(--brand-600)]">
+          <ul className="divide-y divide-[var(--brand-600,#0891b2)]">
             {links.map((link) => (
               <li key={link.href} className="text-center">
                 <Link
                   href={link.href}
                   onClick={(e) => handleAnchorClick(e, link.href)}
-                  aria-current={isActive(link.href) ? "page" : undefined}
+                  aria-current={
+                    isRouteActive(link.href) || isSectionActive(link.href)
+                      ? "page"
+                      : undefined
+                  }
                   className={[
-                    "block w-full px-6 py-4 text-white text-base font-medium",
-                    "no-underline hover:no-underline focus:no-underline",
-                    "hover:text-[var(--brand-600)]",
-                    isActive(link.href) ? "text-[var(--accent)]" : "",
+                    "block w-full px-6 py-4 text-base font-medium no-underline hover:no-underline focus:no-underline transition duration-200 ease-in-out",
+                    linkClasses(link.href),
                   ].join(" ")}
                 >
                   {link.label}

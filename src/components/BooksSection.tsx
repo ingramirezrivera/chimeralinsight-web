@@ -117,7 +117,7 @@ function RetailerModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-teal-800 text-white shadow-2xl">
+      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-teal-600 text-white shadow-2xl">
         <div className="flex items-start justify-between p-6">
           <h2
             id="retailer-title"
@@ -176,7 +176,7 @@ export default function BooksSection({
   const data = items ?? (defaultBooks as Book[]);
 
   const bgClasses =
-    background === "teal" ? "bg-teal-800/70" : "bg-neutral-900/80";
+    background === "teal" ? "bg-[#2f8185e8]" : "bg-neutral-900/80";
 
   return (
     <section id={id} className={`w-full ${bgClasses} font-sans ${className}`}>
@@ -193,7 +193,7 @@ export default function BooksSection({
             return (
               <article
                 key={b.id}
-                className="rounded-2xl border border-white/10 bg-teal-900/30 p-4 sm:p-6"
+                className="rounded-2xl border border-none bg-[var(--brand)] p-4 sm:p-6 shadow-xl"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:gap-8">
                   {/* Cover */}
