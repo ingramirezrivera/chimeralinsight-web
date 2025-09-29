@@ -17,7 +17,7 @@ export default function AboutAuthor({
   sealUrl = "/images/robinr-logo.png",
 }: AboutAuthorProps) {
   return (
-    <section id="about" className="relative py-16 bg-white font-sans">
+    <section id="about" className="relative py-48 -mt-24 bg-white font-sans">
       <div className="md:max-w-5xl mx-auto px-4">
         <div className="relative">
           {/* GRID: foto 4/12, texto 8/12 */}
