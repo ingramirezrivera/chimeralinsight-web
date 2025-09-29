@@ -45,7 +45,7 @@ export default function RetailerModal({
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-teal-800 text-white shadow-2xl">
+      <div className="mx-auto mt-24 w-[92%] max-w-3xl rounded-lg bg-[var(--brand)] text-white shadow-2xl">
         <div className="flex items-start justify-between p-6">
           <h2
             id="retailer-title"
@@ -76,7 +76,7 @@ export default function RetailerModal({
               ref={i === 0 ? firstBtnRef : undefined}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center rounded-md bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition no-underline"
+              className="w-48 inline-flex items-center justify-center rounded-md bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition no-underline"
             >
               {r.label}
             </a>
