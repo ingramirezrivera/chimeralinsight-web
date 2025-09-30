@@ -90,7 +90,7 @@ export default function BooksCarousel() {
               ? ("eager" as const)
               : ("lazy" as const);
 
-            // 👉 Si está en pre-lanzamiento, manda a /launch/[id]/; si no, a /books/[id]/
+            // 👉 upcoming → /launch/[id]/ ; otherwise → /books/[id]/
             const isUpcoming = book.availability === "upcoming";
             const cardHref = isUpcoming
               ? withBasePath(`/launch/${book.id}/`)

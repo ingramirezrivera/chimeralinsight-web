@@ -1,4 +1,4 @@
-// src/app/(wherever your file is)/BooksSection.tsx
+// src/components/BooksSection.tsx
 "use client";
 
 import Image from "next/image";
@@ -17,20 +17,18 @@ type Book = {
   description?: string;
   amazonUrl?: string;
   retailers?: Retailer[];
-  /** ⬇️ para mostrar "Dec 2025" y lógica de CTA */
   availability?: "upcoming" | "available";
   releaseDate?: string; // YYYY-MM-DD
 };
 
-// ✅ Props nuevas
 type BooksSectionProps = {
-  title?: string; // título visible
-  items?: Book[]; // sobrescribe la fuente de datos (opcional)
-  id?: string; // id del <section> (para anchors)
-  className?: string; // clases extra
-  buyLabel?: string; // texto del botón de compra
-  learnMoreLabel?: string; // texto del botón “learn more”
-  background?: "teal" | "dark"; // variante de fondo
+  title?: string;
+  items?: Book[];
+  id?: string;
+  className?: string;
+  buyLabel?: string;
+  learnMoreLabel?: string;
+  background?: "teal" | "dark";
 };
 
 function CTA({
@@ -163,7 +161,6 @@ function RetailerModal({
   );
 }
 
-/* ===== Helpers para CTA dinámico ===== */
 function isUpcoming(availability?: "upcoming" | "available"): boolean {
   return availability === "upcoming";
 }
@@ -193,7 +190,6 @@ export default function BooksSection({
   }>(null);
 
   const data = items ?? (defaultBooks as Book[]);
-
   const bgClasses =
     background === "teal" ? "bg-[#2f8185e8]" : "bg-neutral-900/80";
 
@@ -214,11 +210,15 @@ export default function BooksSection({
               ? formatMonthYearAbbrev(b.releaseDate)
               : buyLabel;
 
-            // ⬇️ Si es upcoming: que el botón vaya a la página del libro y NO abra el modal
-            const ctaHref = upcoming ? `/books/${b.id}` : b.amazonUrl ?? "#";
+            // upcoming → /launch/[id]/ ; otherwise Amazon/modal
+            const ctaHref = upcoming
+              ? withBasePath(`/launch/${b.id}/`)
+              : b.amazonUrl ?? "#";
+
             const ctaAria = upcoming
-              ? `View ${b.title}`
+              ? `View ${b.title} pre-launch`
               : `Buy ${b.title} on Amazon`;
+
             const ctaOnClick =
               !upcoming && hasRetailers
                 ? (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -233,7 +233,6 @@ export default function BooksSection({
                 className="rounded-2xl border border-none bg-[var(--brand)] p-4 sm:p-6 shadow-xl"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:gap-8">
-                  {/* Cover */}
                   <div className="mx-auto md:mx-0 shrink-0">
                     <div className="relative h-96 w-60 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
                       <Image
@@ -246,7 +245,7 @@ export default function BooksSection({
                       />
                     </div>
                   </div>
-                  {/* Text */}
+
                   <div className="mt-5 md:mt-10 font-medium flex-1 text-white/95">
                     <h3 className="text-xl md:text-2xl">{b.title}</h3>
 
@@ -260,7 +259,6 @@ export default function BooksSection({
                       </p>
                     )}
 
-                    {/* Actions */}
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
                       <CTA
                         href={ctaHref}
@@ -272,8 +270,9 @@ export default function BooksSection({
                       >
                         {dynamicBuyLabel}
                       </CTA>
+
                       <CTA
-                        href={`/books/${b.id}`}
+                        href={withBasePath(`/books/${b.id}/`)}
                         ariaLabel={`Learn more about ${b.title}`}
                         variant="custom"
                         fullWidth
@@ -290,7 +289,6 @@ export default function BooksSection({
         </div>
       </div>
 
-      {/* Modal */}
       <RetailerModal
         open={!!selected}
         onClose={() => setSelected(null)}

@@ -21,6 +21,10 @@ type BookData = {
   releaseDate?: string; // ISO YYYY-MM-DD
 };
 
+// ⬇️ fuerza export estático y limita a params generados (GH Pages-friendly)
+export const dynamic = "force-static";
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
 }
@@ -41,7 +45,7 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    // 👇 añade slash final para export/GitHub Pages
+    // 👇 slash final para export/GitHub Pages
     alternates: { canonical: withBasePath(`/books/${book.id}/`) },
   };
 }
@@ -131,75 +135,4 @@ export default async function BookPage({
                 <p className="mt-2 text-xl text-[#494949]">{book.subtitle}</p>
               )}
 
-              <div className="mt-5 space-y-4 text-[#494949] leading-relaxed">
-                {(content ?? "")
-                  .split(/\n\s*\n/)
-                  .map((para: string, i: number) => (
-                    <p key={i}>{para}</p>
-                  ))}
-              </div>
-
-              <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-3">
-                {upcoming ? (
-                  <>
-                    <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
-                      Coming Soon — {formatRelease(book.releaseDate)}
-                    </span>
-                    <Link
-                      href={withBasePath(`/launch/${book.id}/`)}
-                      className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
-                                 font-semibold px-6 py-3 text-lg transition-colors no-underline"
-                      aria-label={`Pre-Launch page for ${book.title}`}
-                    >
-                      Pre-Launch Page
-                    </Link>
-                  </>
-                ) : (
-                  <BuyRetailerModalButton
-                    title={book.title}
-                    retailers={retailers}
-                    href={book.amazonUrl}
-                    ariaLabel={`Buy ${book.title} on Amazon`}
-                    className="rounded-lg bg-cyan-400 hover:bg-cyan-300 w-48 text-center text-teal-900
-                               font-semibold px-6 py-3 text-lg transition-colors no-underline"
-                  >
-                    Buy on Amazon
-                  </BuyRetailerModalButton>
-                )}
-
-                <Link
-                  href={withBasePath("/#books")}
-                  className="rounded-lg bg-gray-700/70 w-48 text-center hover:bg-gray-600 text-white
-                             font-semibold px-6 py-3 text-lg transition-colors no-underline"
-                >
-                  Back to Books
-                </Link>
-              </div>
-            </div>
-          </div>
-
-          {/* Logo Amazon opcional */}
-          {!upcoming && (
-            <div className="text-center mt-10 pb-10 flex flex-col items-center">
-              <p className="text-2xl mb-4 text-neutral-700">Available on:</p>
-              <a
-                href="https://www.amazon.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-64 md:w-96"
-              >
-                <Image
-                  src={withBasePath("/images/amazon-logo.png")}
-                  alt="Amazon Logo"
-                  width={384}
-                  height={96}
-                  className="object-contain w-full h-auto"
-                />
-              </a>
-            </div>
-          )}
-        </div>
-      </section>
-    </main>
-  );
-}
+              <div clas
