@@ -100,6 +100,9 @@ export default function BooksCarousel() {
                   sectionId="buy" // 👈 salta a la sección #buy
                   priority={isPriority}
                   loading={imgLoading}
+                  /* 👇👇 NUEVO: pasar disponibilidad y fecha para que el botón muestre "Dec 2025" en upcoming */
+                  availability={book.availability}
+                  releaseDate={book.releaseDate}
                 />
               </div>
             );

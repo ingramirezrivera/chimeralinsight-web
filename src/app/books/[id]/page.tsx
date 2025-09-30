@@ -7,12 +7,18 @@ import { books } from "@/data/books";
 import BuyRetailerModalButton from "@/components/BuyRetailerModalButton";
 import { withBasePath } from "@/lib/paths";
 
-type Book = (typeof books)[number];
 type Retailer = { id: string; label: string; url: string };
-type Extras = {
+type BookData = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  description?: string;
   about?: string;
-  retailers?: Retailer[];
+  coverSrc: string;
   amazonUrl?: string;
+  retailers?: Retailer[];
+  availability?: "upcoming" | "available";
+  releaseDate?: string; // ISO YYYY-MM-DD
 };
 
 export function generateStaticParams() {
@@ -26,7 +32,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const book = books.find((b) => b.id === id);
+  const book = books.find((b) => b.id === id) as BookData | undefined;
   if (!book) return { title: "Book not found" };
 
   const desc =
@@ -35,9 +41,24 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    // ⬇️ Ajuste puntual: usar basePath para canonical
     alternates: { canonical: withBasePath(`/books/${book.id}`) },
   };
+}
+
+/* ===== Helpers mínimos para pre-lanzamiento (sin any) ===== */
+function isUpcoming(book: BookData): boolean {
+  return book.availability === "upcoming";
+}
+
+function formatRelease(dateISO?: string): string {
+  if (!dateISO) return "Soon";
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const date = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "long",
+    timeZone: "UTC",
+  });
 }
 
 export default async function BookPage({
@@ -47,23 +68,21 @@ export default async function BookPage({
 }) {
   const { id } = await params;
 
-  const book = books.find((b) => b.id === id) as Book | undefined;
+  const book = books.find((b) => b.id === id) as BookData | undefined;
   if (!book) notFound();
 
-  // Campos opcionales que algunos libros pueden traer
-  const extras = book as unknown as Extras;
-
-  const content: string = extras.about ?? book.description ?? "";
-  const retailers: Retailer[] | undefined = Array.isArray(extras.retailers)
-    ? extras.retailers
+  const content: string = book.about ?? book.description ?? "";
+  const retailers: Retailer[] | undefined = Array.isArray(book.retailers)
+    ? book.retailers
     : undefined;
+
+  const upcoming = isUpcoming(book);
 
   return (
     <main className="font-sans">
       {/* Cabecera simple */}
       <header className="bg-[var(--brand)] bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          {/* ⬇️ Ajuste puntual: Links con basePath */}
           <Link
             href={withBasePath("/")}
             className="no-underline hover:no-underline"
@@ -120,19 +139,33 @@ export default async function BookPage({
               </div>
 
               <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-3">
-                {/* Abre modal si hay retailers; si no, usa href */}
-                <BuyRetailerModalButton
-                  title={book.title}
-                  retailers={retailers}
-                  href={extras.amazonUrl}
-                  ariaLabel={`Buy ${book.title} on Amazon`}
-                  className="rounded-lg bg-cyan-400 hover:bg-cyan-300 w-48 text-center text-teal-900
-                             font-semibold px-6 py-3 text-lg transition-colors no-underline"
-                >
-                  Buy on Amazon
-                </BuyRetailerModalButton>
+                {upcoming ? (
+                  <>
+                    <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-lg font-semibold">
+                      Coming Soon — {formatRelease(book.releaseDate)}
+                    </span>
+                    <Link
+                      href={withBasePath(`/launch/${book.id}`)}
+                      className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
+                                 font-semibold px-6 py-3 text-lg transition-colors no-underline"
+                      aria-label={`Pre-Launch page for ${book.title}`}
+                    >
+                      Pre-Launch Page
+                    </Link>
+                  </>
+                ) : (
+                  <BuyRetailerModalButton
+                    title={book.title}
+                    retailers={retailers}
+                    href={book.amazonUrl}
+                    ariaLabel={`Buy ${book.title} on Amazon`}
+                    className="rounded-lg bg-cyan-400 hover:bg-cyan-300 w-48 text-center text-teal-900
+                               font-semibold px-6 py-3 text-lg transition-colors no-underline"
+                  >
+                    Buy on Amazon
+                  </BuyRetailerModalButton>
+                )}
 
-                {/* ⬇️ Ajuste puntual: Link con basePath */}
                 <Link
                   href={withBasePath("/#books")}
                   className="rounded-lg bg-gray-700/70 w-48 text-center hover:bg-gray-600 text-white
@@ -145,23 +178,25 @@ export default async function BookPage({
           </div>
 
           {/* Logo Amazon opcional */}
-          <div className="text-center mt-10 pb-10 flex flex-col items-center">
-            <p className="text-2xl mb-4 text-neutral-700">Available on:</p>
-            <a
-              href="https://www.amazon.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-64 md:w-96"
-            >
-              <Image
-                src={withBasePath("/images/amazon-logo.png")}
-                alt="Amazon Logo"
-                width={384}
-                height={96}
-                className="object-contain w-full h-auto"
-              />
-            </a>
-          </div>
+          {!upcoming && (
+            <div className="text-center mt-10 pb-10 flex flex-col items-center">
+              <p className="text-2xl mb-4 text-neutral-700">Available on:</p>
+              <a
+                href="https://www.amazon.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-64 md:w-96"
+              >
+                <Image
+                  src={withBasePath("/images/amazon-logo.png")}
+                  alt="Amazon Logo"
+                  width={384}
+                  height={96}
+                  className="object-contain w-full h-auto"
+                />
+              </a>
+            </div>
+          )}
         </div>
       </section>
     </main>

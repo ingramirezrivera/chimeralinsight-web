@@ -5,6 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { withBasePath } from "@/lib/paths";
 
+type Availability = "upcoming" | "available";
+
 interface BookCardProps {
   title: string;
   imageUrl: string;
@@ -17,6 +19,26 @@ interface BookCardProps {
   priority?: boolean;
   loading?: "eager" | "lazy";
   blurDataURL?: string;
+  /** NUEVO: estado de disponibilidad leído desde books data */
+  availability?: Availability;
+  /** NUEVO: fecha de lanzamiento ISO (YYYY-MM-DD) desde books data */
+  releaseDate?: string;
+}
+
+/* ===== Helpers para CTA dinámico sin usar any ===== */
+function isUpcoming(av?: Availability): boolean {
+  return av === "upcoming";
+}
+function formatMonthYearAbbrev(dateISO?: string): string {
+  if (!dateISO) return "Soon";
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  // Ejemplo: "Dec 2025"
+  return dt.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 }
 
 const BookCard = ({
@@ -28,6 +50,8 @@ const BookCard = ({
   priority = false,
   loading,
   blurDataURL,
+  availability,
+  releaseDate,
 }: BookCardProps) => {
   const resolvedLoading: "eager" | "lazy" =
     loading ?? (priority ? "eager" : "lazy");
@@ -44,6 +68,15 @@ const BookCard = ({
 
   // externo solo si vamos a Amazon (cuando no hay page interna)
   const isExternal = !hasBookPage && hasAmazon;
+
+  // NUEVO: label dinámico -> "Dec 2025" si es upcoming, si no "Buy"
+  const ctaLabel = isUpcoming(availability)
+    ? formatMonthYearAbbrev(releaseDate)
+    : "Buy";
+
+  const aria = isUpcoming(availability)
+    ? `Releases ${ctaLabel}`
+    : `Buy ${title}${isExternal ? " on Amazon" : ""}`;
 
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
@@ -82,12 +115,12 @@ const BookCard = ({
             {...(isExternal
               ? { target: "_blank", rel: "noopener noreferrer" }
               : {})}
-            aria-label={`Buy ${title}${isExternal ? " on Amazon" : ""}`}
+            aria-label={aria}
             className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                        font-semibold px-6 py-3 text-lg transition-colors
                        text-center mt-4 hover:[text-decoration:none]"
           >
-            Buy
+            {ctaLabel}
           </Link>
         </div>
       </div>

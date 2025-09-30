@@ -1,3 +1,4 @@
+// src/app/(wherever your file is)/BooksSection.tsx
 "use client";
 
 import Image from "next/image";
@@ -16,6 +17,9 @@ type Book = {
   description?: string;
   amazonUrl?: string;
   retailers?: Retailer[];
+  /** ⬇️ para mostrar "Dec 2025" y lógica de CTA */
+  availability?: "upcoming" | "available";
+  releaseDate?: string; // YYYY-MM-DD
 };
 
 // ✅ Props nuevas
@@ -159,6 +163,21 @@ function RetailerModal({
   );
 }
 
+/* ===== Helpers para CTA dinámico ===== */
+function isUpcoming(availability?: "upcoming" | "available"): boolean {
+  return availability === "upcoming";
+}
+function formatMonthYearAbbrev(dateISO?: string): string {
+  if (!dateISO) return "Soon";
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  return dt.toLocaleDateString("en-US", {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }); // ej: "Dec 2025"
+}
+
 export default function BooksSection({
   title = "Books",
   items,
@@ -189,6 +208,24 @@ export default function BooksSection({
           {data.map((b) => {
             const retailers: Retailer[] = b.retailers ?? [];
             const hasRetailers = retailers.length > 0;
+
+            const upcoming = isUpcoming(b.availability);
+            const dynamicBuyLabel = upcoming
+              ? formatMonthYearAbbrev(b.releaseDate)
+              : buyLabel;
+
+            // ⬇️ Si es upcoming: que el botón vaya a la página del libro y NO abra el modal
+            const ctaHref = upcoming ? `/books/${b.id}` : b.amazonUrl ?? "#";
+            const ctaAria = upcoming
+              ? `View ${b.title}`
+              : `Buy ${b.title} on Amazon`;
+            const ctaOnClick =
+              !upcoming && hasRetailers
+                ? (e: React.MouseEvent<HTMLAnchorElement>) => {
+                    e.preventDefault();
+                    setSelected({ title: b.title, retailers });
+                  }
+                : undefined;
 
             return (
               <article
@@ -226,21 +263,14 @@ export default function BooksSection({
                     {/* Actions */}
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
                       <CTA
-                        href={b.amazonUrl ?? "#"}
-                        ariaLabel={`Buy ${b.title} on Amazon`}
+                        href={ctaHref}
+                        ariaLabel={ctaAria}
                         variant="custom"
                         fullWidth
                         className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
-                        onClick={
-                          hasRetailers
-                            ? (e) => {
-                                e.preventDefault();
-                                setSelected({ title: b.title, retailers });
-                              }
-                            : undefined
-                        }
+                        onClick={ctaOnClick}
                       >
-                        {buyLabel}
+                        {dynamicBuyLabel}
                       </CTA>
                       <CTA
                         href={`/books/${b.id}`}
