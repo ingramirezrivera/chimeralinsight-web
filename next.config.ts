@@ -5,12 +5,11 @@ const base = isProd ? `/${repo}` : "";
 
 const nextConfig = {
   output: "export",
-  trailingSlash: true, // /ruta/ -> index.html (recomendado en GH Pages)
+  trailingSlash: true, // genera /ruta/index.html
   images: { unoptimized: true },
-  basePath: base, // ✅ Next prefija rutas internas y assets
-  // ❌ NO pongas assetPrefix (rompe rutas en Pages)
+  basePath: base, // prefija rutas internas en GH Pages
   env: {
-    NEXT_PUBLIC_BASE_PATH: base, // tu helper withBasePath seguirá funcionando
+    NEXT_PUBLIC_BASE_PATH: base, // para tu helper withBasePath
   },
 };
 
