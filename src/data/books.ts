@@ -1,4 +1,6 @@
 // src/data/books.ts
+export type Availability = "available" | "upcoming";
+
 export interface Retailer {
   id: string; // ej. "amazon", "amazon-uk"
   label: string; // texto del botón
@@ -14,6 +16,8 @@ export interface BookData {
   coverSrc: string;
   amazonUrl?: string; // opcional (legacy)
   retailers: Retailer[]; // NUEVO
+  availability?: Availability; // NUEVO (si falta, trátalo como "available")
+  releaseDate?: string; // NUEVO (ISO, p.ej. "2025-12-01" cuando upcoming)
 }
 
 export const books: BookData[] = [
@@ -24,22 +28,27 @@ export const books: BookData[] = [
     description:
       "They all drank the Kool-Aid and one thousand people died. Amadeus and Theo Savoie are twins, estranged for years, the products of a childhood torn apart by religion, abandonment and suicide. With his partner, Dr. Angelica Pali, Amadeus sifts through a maze of religious rituals with all signs pointing to the convergence of a religious and...",
     coverSrc: "/images/books/the-tao-of-the-thirteenth-good.jpg",
-    amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
+    amazonUrl: "https://www.amazon.com/dp/0987772015",
     retailers: [
       {
         id: "amazon",
         label: "Amazon",
-        url: "https://www.amazon.com/dp/XXXXXXXX",
+        url: "https://www.amazon.com/dp/0987772015",
       },
       {
         id: "amazon-uk",
         label: "Amazon UK",
-        url: "https://www.amazon.co.uk/dp/XXXXXXXX",
+        url: "https://www.amazon.co.uk/dp/0987772015",
       },
       {
         id: "amazon-ca",
         label: "Amazon CA",
-        url: "https://www.amazon.ca/dp/XXXXXXXX",
+        url: "https://www.amazon.ca/dp/0987772015",
+      },
+      {
+        id: "amazon-AU",
+        label: "Amazon AU",
+        url: "https://www.amazon.com.au/dp/0987772015",
       },
     ],
     about: `They all drank the Kool-Aid and one thousand people died.
@@ -57,22 +66,27 @@ Superstition, coded messages and drug induced visions of the dead, combine to cr
     description:
       "War kills in many ways—with speed, with brutality…with stealth. At the end of the 20th century, America prepares for a war that could transform the world. But that war has already been fought. . .and America has lost. In the lingering chaos of the Middle East conflict, a pathogen is unleashed. This plague has been engineered to suffocate its...",
     coverSrc: "/images/books/vaccine.jpg",
-    amazonUrl: "https://www.amazon.com/dp/XXXXXXXX",
+    amazonUrl: "https://www.amazon.com/dp/B009596W5O",
     retailers: [
       {
         id: "amazon",
         label: "Amazon",
-        url: "https://www.amazon.com/dp/XXXXXXXX",
+        url: "https://www.amazon.com/dp/B009596W5O",
       },
       {
         id: "amazon-uk",
         label: "Amazon UK",
-        url: "https://www.amazon.co.uk/dp/XXXXXXXX",
+        url: "https://www.amazon.co.uk/dp/B009596W5O",
       },
       {
         id: "amazon-ca",
         label: "Amazon CA",
-        url: "https://www.amazon.ca/dp/XXXXXXXX",
+        url: "https://www.amazon.ca/dp/B009596W5O",
+      },
+      {
+        id: "amazon-AU",
+        label: "Amazon AU",
+        url: "https://www.amazon.com.au/dp/B009596W5O",
       },
     ],
     about: `War kills in many ways—with speed, with brutality…with stealth.
@@ -105,7 +119,15 @@ Blackmail, bioterror, deception—an electrifying terrorism thriller that merges
         label: "Amazon CA",
         url: "https://www.amazon.ca/dp/XXXXXXXX",
       },
+      {
+        id: "amazon-AU",
+        label: "Amazon AU",
+        url: "https://www.amazon.com.au/dp/B009596W5O",
+      },
     ],
+    // NUEVO: marcar como “upcoming” y fecha de lanzamiento en diciembre
+    availability: "upcoming",
+    releaseDate: "2025-12-01",
     about: `The Weapons of War are Always Changing.
 
 In the real world, clandestine scientific research has already created UNNATURAL BORN KILLERS, super soldiers, genetically modified killing machines.
