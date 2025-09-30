@@ -145,8 +145,9 @@ export default async function BookPage({
                     <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
                       Coming Soon — {formatRelease(book.releaseDate)}
                     </span>
+                    {/* 👇 slash final para GH Pages */}
                     <Link
-                      href={withBasePath(`/launch/${book.id}/`)} {/* 👈 slash final para GH Pages */}
+                      href={withBasePath(`/launch/${book.id}/`)}
                       className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
                                  font-semibold px-6 py-3 text-lg transition-colors no-underline"
                       aria-label={`Pre-Launch page for ${book.title}`}
