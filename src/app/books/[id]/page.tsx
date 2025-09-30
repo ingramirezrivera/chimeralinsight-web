@@ -141,7 +141,7 @@ export default async function BookPage({
               <div className="mt-8 flex flex-wrap justify-center md:justify-start gap-3">
                 {upcoming ? (
                   <>
-                    <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-lg font-semibold">
+                    <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
                       Coming Soon — {formatRelease(book.releaseDate)}
                     </span>
                     <Link

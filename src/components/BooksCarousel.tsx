@@ -90,17 +90,26 @@ export default function BooksCarousel() {
               ? ("eager" as const)
               : ("lazy" as const);
 
+            // 👉 Si está en pre-lanzamiento, manda a /launch/[id]; si no, a /books/[id]
+            const isUpcoming = book.availability === "upcoming";
+            const cardHref = isUpcoming
+              ? withBasePath(`/launch/${book.id}`)
+              : withBasePath(`/books/${book.id}`);
+            const section = isUpcoming ? "" : "buy"; // no agregues #buy en launch
+
             return (
               <div key={book.id} className="snap-center shrink-0 md:shrink">
                 <BookCard
                   title={book.title}
                   imageUrl={book.coverSrc}
-                  amazonUrl={book.amazonUrl ?? `/books/${book.id}#buy`} // fallback si algún día no tienes page
-                  bookHref={`/books/${book.id}`} // 👈 navega a la página del libro
-                  sectionId="buy" // 👈 salta a la sección #buy
+                  amazonUrl={
+                    book.amazonUrl ?? withBasePath(`/books/${book.id}#buy`)
+                  } // fallback interno con basePath
+                  bookHref={cardHref} // 👈 navega según availability
+                  sectionId={section} // 👈 evita #buy en launch
                   priority={isPriority}
                   loading={imgLoading}
-                  /* 👇👇 NUEVO: pasar disponibilidad y fecha para que el botón muestre "Dec 2025" en upcoming */
+                  /* 👇 Para que el botón muestre "Dec 2025" en upcoming */
                   availability={book.availability}
                   releaseDate={book.releaseDate}
                 />
