@@ -1,9 +1,10 @@
+// src/components/RegisterForLaunchForm.tsx
 "use client";
 
 import { useState } from "react";
-import { withBasePath } from "../../../lib/paths"; // [id] → launch → app → lib
+import { withBasePath } from "@/lib/paths"; // ✅ corregido
 
-interface RegisterProps {
+export interface RegisterProps {
   bookId: string;
   bookTitle: string;
 }
