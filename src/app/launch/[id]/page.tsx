@@ -1,10 +1,15 @@
+// src/app/launch/[id]/page.tsx
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { books } from "@/data/books";
 import { withBasePath } from "@/lib/paths";
-import RegisterForLaunchForm from "./RegisterForLaunchForm.client"; // co-localizado
+import RegisterForLaunchForm from "./RegisterForLaunchForm.client";
+
+// Fuerza generación estática y que solo existan los params generados
+export const dynamic = "force-static";
+export const dynamicParams = false;
 
 // Tipos mínimos (sin any)
 interface BookData {
@@ -14,30 +19,30 @@ interface BookData {
   description?: string;
   coverSrc: string;
   availability?: "upcoming" | "available";
-  releaseDate?: string;
+  releaseDate?: string; // ISO YYYY-MM-DD
 }
 
 function findBook(id: string): BookData | undefined {
-  // books viene tipado; hacemos un narrow explícito aquí
   return books.find((b) => b.id === id) as BookData | undefined;
 }
 
 function formatRelease(dateISO?: string): string {
   if (!dateISO) return "Soon";
-  const d = new Date(dateISO); // parse ISO (UTC)
-  // Forzar UTC para que no cambie el mes por la zona horaria local
-  return d.toLocaleDateString(undefined, {
+  const [y, m, d] = dateISO.split("-").map(Number);
+  const date = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
+  return date.toLocaleDateString(undefined, {
     year: "numeric",
     month: "long",
+    day: "numeric",
     timeZone: "UTC",
   });
 }
 
 export function generateStaticParams() {
+  // Asegura que aquí esté el id del libro en pre-lanzamiento (p.ej., "whip")
   return books.map((b) => ({ id: b.id }));
 }
 
-// En Next 15, aquí SÍ llega como Promise (ok)
 export async function generateMetadata({
   params,
 }: {
@@ -55,9 +60,12 @@ export async function generateMetadata({
   };
 }
 
-// ⚠️ En el componente de página, params NO es Promise
-export default function LaunchPage({ params }: { params: { id: string } }) {
-  const { id } = params;
+export default async function LaunchPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params; // 👈 importante
   const book = findBook(id);
   if (!book) notFound();
 
@@ -114,7 +122,7 @@ export default function LaunchPage({ params }: { params: { id: string } }) {
 
               <div className="mt-4">
                 {(availability === "upcoming" || releaseDate) && (
-                  <span className="inline-flex items-center rounded-md bg-yellow-500 text-white px-3 py-1 text-lg font-semibold">
+                  <span className="inline-flex items-center rounded-md bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
                     Coming Soon
                     {releaseDate ? ` — ${formatRelease(releaseDate)}` : ""}
                   </span>
@@ -126,15 +134,19 @@ export default function LaunchPage({ params }: { params: { id: string } }) {
                   Sign up to be notified the moment this title launches. We’ll
                   email you a direct link when it’s available.
                 </p>
+                {book.description && (
+                  <p className="text-[15px] text-neutral-700">
+                    {book.description}
+                  </p>
+                )}
               </div>
 
-              {/* Formulario de registro específico para este libro */}
               <RegisterForLaunchForm bookId={book.id} bookTitle={book.title} />
             </div>
           </div>
 
           {/* Navegación secundaria */}
-          <div className="mt-10 flex gap-3 flex justify-center ">
+          <div className="mt-10 flex gap-3">
             <Link
               href={withBasePath(`/books/${book.id}`)}
               className="rounded-lg bg-gray-800 text-white px-5 py-3 font-semibold hover:opacity-90 no-underline"
