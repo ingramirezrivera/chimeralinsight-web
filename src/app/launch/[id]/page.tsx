@@ -38,9 +38,11 @@ function formatRelease(dateISO?: string): string {
   });
 }
 
+// ✅ Punto 4: solo generamos rutas de libros en pre-lanzamiento
 export function generateStaticParams() {
-  // Asegura que aquí esté el id del libro en pre-lanzamiento (p.ej., "whip")
-  return books.map((b) => ({ id: b.id }));
+  return books
+    .filter((b) => b.availability === "upcoming")
+    .map((b) => ({ id: b.id }));
 }
 
 export async function generateMetadata({
