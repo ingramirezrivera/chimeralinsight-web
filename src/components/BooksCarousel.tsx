@@ -90,11 +90,11 @@ export default function BooksCarousel() {
               ? ("eager" as const)
               : ("lazy" as const);
 
-            // 👉 Si está en pre-lanzamiento, manda a /launch/[id]; si no, a /books/[id]
+            // 👉 Si está en pre-lanzamiento, manda a /launch/[id]/; si no, a /books/[id]/
             const isUpcoming = book.availability === "upcoming";
             const cardHref = isUpcoming
-              ? withBasePath(`/launch/${book.id}`)
-              : withBasePath(`/books/${book.id}`);
+              ? withBasePath(`/launch/${book.id}/`)
+              : withBasePath(`/books/${book.id}/`);
             const section = isUpcoming ? "" : "buy"; // no agregues #buy en launch
 
             return (
@@ -103,7 +103,7 @@ export default function BooksCarousel() {
                   title={book.title}
                   imageUrl={book.coverSrc}
                   amazonUrl={
-                    book.amazonUrl ?? withBasePath(`/books/${book.id}#buy`)
+                    book.amazonUrl ?? withBasePath(`/books/${book.id}/#buy`)
                   } // fallback interno con basePath
                   bookHref={cardHref} // 👈 navega según availability
                   sectionId={section} // 👈 evita #buy en launch

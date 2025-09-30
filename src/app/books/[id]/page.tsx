@@ -41,7 +41,8 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    alternates: { canonical: withBasePath(`/books/${book.id}`) },
+    // 👇 añade slash final para export/GitHub Pages
+    alternates: { canonical: withBasePath(`/books/${book.id}/`) },
   };
 }
 
@@ -145,7 +146,7 @@ export default async function BookPage({
                       Coming Soon — {formatRelease(book.releaseDate)}
                     </span>
                     <Link
-                      href={withBasePath(`/launch/${book.id}`)}
+                      href={withBasePath(`/launch/${book.id}/`)} {/* 👈 slash final para GH Pages */}
                       className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
                                  font-semibold px-6 py-3 text-lg transition-colors no-underline"
                       aria-label={`Pre-Launch page for ${book.title}`}
