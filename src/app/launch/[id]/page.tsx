@@ -2,16 +2,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation"; // ⬅️ añadimos redirect
+import { notFound, redirect } from "next/navigation";
 import { books } from "@/data/books";
 import { withBasePath } from "@/lib/paths";
 import RegisterForLaunchForm from "./RegisterForLaunchForm.client";
 
-// Fuerza generación estática y que solo existan los params generados
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
-// Tipos mínimos (sin any)
+/* ===== Tipos ===== */
 interface BookData {
   id: string;
   title: string;
@@ -19,7 +18,7 @@ interface BookData {
   description?: string;
   coverSrc: string;
   availability?: "upcoming" | "available";
-  releaseDate?: string; // ISO YYYY-MM-DD
+  releaseDate?: string; // ISO
 }
 
 function findBook(id: string): BookData | undefined {
@@ -38,7 +37,6 @@ function formatRelease(dateISO?: string): string {
   });
 }
 
-// ✅ Generamos TODAS las rutas para que existan los HTML en GH Pages
 export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
 }
@@ -56,7 +54,8 @@ export async function generateMetadata({
     title: `Launch — ${book.title} | Chimeralinsight`,
     description:
       book.subtitle ?? book.description?.slice(0, 160) ?? "Book pre-launch",
-    alternates: { canonical: withBasePath(`/launch/${book.id}/`) }, // ↩︎ slash final
+    // Canonical con basePath (meta)
+    alternates: { canonical: withBasePath(`/launch/${book.id}/`) },
   };
 }
 
@@ -65,11 +64,11 @@ export default async function LaunchPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params; // 👈 importante
+  const { id } = await params;
   const book = findBook(id);
   if (!book) notFound();
 
-  // ⬅️ Si no está en prelaunch, redirige a la página normal del libro
+  // ⬇️ En export estático, mantén el basePath en el redirect
   if (book.availability !== "upcoming") {
     redirect(withBasePath(`/books/${id}/`));
   }
@@ -81,18 +80,13 @@ export default async function LaunchPage({
     <main className="font-sans">
       <header className="bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          <Link
-            href={withBasePath("/")}
-            className="no-underline hover:no-underline"
-          >
+          {/* INTERNAL: Link sin withBasePath */}
+          <Link href="/" className="no-underline hover:no-underline">
             <span className="text-lg font-semibold hover:opacity-90">
               ← Back to Home
             </span>
           </Link>
-          <Link
-            href={withBasePath("/#books")}
-            className="underline hover:opacity-90"
-          >
+          <Link href="/#books" className="underline hover:opacity-90">
             All Books
           </Link>
         </div>
@@ -104,8 +98,9 @@ export default async function LaunchPage({
             {/* Cover */}
             <div className="md:col-span-5">
               <div className="relative aspect-[3/4] w-full max-w-[420px] mx-auto overflow-hidden rounded-2xl shadow">
+                {/* next/image: NO withBasePath */}
                 <Image
-                  src={withBasePath(book.coverSrc)}
+                  src={book.coverSrc}
                   alt={`${book.title} cover`}
                   fill
                   className="object-contain"
@@ -152,14 +147,15 @@ export default async function LaunchPage({
 
           {/* Navegación secundaria */}
           <div className="mt-10 flex justify-center gap-3">
+            {/* INTERNAL: Link sin withBasePath, con slash final */}
             <Link
-              href={withBasePath(`/books/${book.id}/`)} // ↩︎ slash final
+              href={`/books/${book.id}/`}
               className="rounded-lg bg-gray-800 text-white px-5 py-3 font-semibold hover:opacity-90 no-underline"
             >
               View Book Page
             </Link>
             <Link
-              href={withBasePath("/#books")}
+              href="/#books"
               className="rounded-lg bg-gray-700/70 text-white px-5 py-3 font-semibold hover:bg-gray-600 no-underline"
             >
               Back to Books

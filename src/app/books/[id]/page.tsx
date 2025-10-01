@@ -21,7 +21,7 @@ type BookData = {
   releaseDate?: string; // ISO YYYY-MM-DD
 };
 
-// fuerza export estático y limita a params generados (GH Pages-friendly)
+// Export estático y solo params generados (GH Pages-friendly)
 export const dynamic = "force-static";
 export const dynamicParams = false;
 
@@ -45,11 +45,12 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    alternates: { canonical: withBasePath(`/books/${book.id}/`) }, // slash final para export
+    // Canonical con basePath sí (esto es meta, no navegación)
+    alternates: { canonical: withBasePath(`/books/${book.id}/`) },
   };
 }
 
-/* ===== Helpers mínimos para pre-lanzamiento (sin any) ===== */
+/* ===== Helpers ===== */
 function isUpcoming(book: BookData): boolean {
   return book.availability === "upcoming";
 }
@@ -71,7 +72,6 @@ export default async function BookPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-
   const book = books.find((b) => b.id === id) as BookData | undefined;
   if (!book) notFound();
 
@@ -84,35 +84,31 @@ export default async function BookPage({
 
   return (
     <main className="font-sans">
-      {/* Cabecera simple */}
+      {/* Header */}
       <header className="bg-[var(--brand)] bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          <Link
-            href={withBasePath("/")}
-            className="no-underline hover:no-underline"
-          >
+          {/* ⬇️ INTERNAL: usar Link sin withBasePath */}
+          <Link href="/" className="no-underline hover:no-underline">
             <span className="text-lg font-semibold hover:opacity-90">
               ← Back to Home
             </span>
           </Link>
-          <Link
-            href={withBasePath("/#books")}
-            className="underline hover:opacity-90"
-          >
+          <Link href="/#books" className="underline hover:opacity-90">
             All Books
           </Link>
         </div>
       </header>
 
-      {/* Cuerpo */}
+      {/* Body */}
       <section className="relative py-2 md:py-1 bg-white">
         <div className="container mx-auto px-4 md:max-w-5xl">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 p-2 md:p-10 items-start rounded-2xl ">
-            {/* Portada (completa, sin recortar) */}
+            {/* Cover */}
             <div className="md:col-span-4">
               <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto overflow-hidden">
+                {/* ⬇️ next/image: NO withBasePath */}
                 <Image
-                  src={withBasePath(book.coverSrc)}
+                  src={book.coverSrc}
                   alt={`${book.title} cover`}
                   fill
                   className="object-contain"
@@ -123,7 +119,7 @@ export default async function BookPage({
               </div>
             </div>
 
-            {/* Texto */}
+            {/* Text */}
             <div className="md:col-span-8">
               <p className="text-[#494949] font-large tracking-wide">Book</p>
               <h1 className="text-4xl md:text-5xl font-extrabold text-[#494949] leading-tight mt-1">
@@ -148,8 +144,9 @@ export default async function BookPage({
                     <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
                       Coming Soon — {formatRelease(book.releaseDate)}
                     </span>
+                    {/* ⬇️ INTERNAL: Link sin withBasePath, con slash final */}
                     <Link
-                      href={withBasePath(`/launch/${book.id}/`)} // slash final
+                      href={`/launch/${book.id}/`}
                       className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
                                  font-semibold px-6 py-3 text-lg transition-colors no-underline"
                       aria-label={`Pre-Launch page for ${book.title}`}
@@ -171,7 +168,7 @@ export default async function BookPage({
                 )}
 
                 <Link
-                  href={withBasePath("/#books")}
+                  href="/#books"
                   className="rounded-lg bg-gray-700/70 w-48 text-center hover:bg-gray-600 text-white
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
                 >
@@ -181,7 +178,7 @@ export default async function BookPage({
             </div>
           </div>
 
-          {/* Logo Amazon opcional */}
+          {/* Amazon logo opcional */}
           {!upcoming && (
             <div className="text-center mt-10 pb-10 flex flex-col items-center">
               <p className="text-2xl mb-4 text-neutral-700">Available on:</p>
@@ -191,8 +188,9 @@ export default async function BookPage({
                 rel="noopener noreferrer"
                 className="block w-64 md:w-96"
               >
+                {/* ⬇️ next/image: NO withBasePath */}
                 <Image
-                  src={withBasePath("/images/amazon-logo.png")}
+                  src="/images/amazon-logo.png"
                   alt="Amazon Logo"
                   width={384}
                   height={96}

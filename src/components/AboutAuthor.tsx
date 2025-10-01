@@ -93,7 +93,7 @@ export default function AboutAuthor({
 
               <div className="mt-12 mb-12 flex justify-center">
                 <Link
-                  href="/#mailing-list" // ← navegación SPA al ancla en Home
+                  href="/#mailing-list"
                   prefetch
                   className=" w-full rounded-lg text-cyan-400 hover:bg-cyan-800 bg-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed text-center mt-4 hover:[text-decoration:none]"
                 >

@@ -9,23 +9,37 @@ type Availability = "upcoming" | "available";
 
 interface BookCardProps {
   title: string;
-  imageUrl: string;
-  /** URL externa a Amazon (opcional) */
-  amazonUrl?: string;
-  /** Ruta interna a la página del libro, ej: /books/tao (opcional) */
-  bookHref?: string;
-  /** Sección a la que quieres saltar, ej: "buy" (por defecto) */
-  sectionId?: string;
+  imageUrl: string; // ej: "/images/cover.png"
+  bookHref?: string; // ej: "/books/tao" o "/books/tao/" (puede venir con o sin basePath)
+  sectionId?: string; // ej: "buy"
   priority?: boolean;
   loading?: "eager" | "lazy";
   blurDataURL?: string;
-  /** NUEVO: estado de disponibilidad leído desde books data */
-  availability?: Availability;
-  /** NUEVO: fecha de lanzamiento ISO (YYYY-MM-DD) desde books data */
+  availability?: Availability; // solo para la etiqueta del botón
   releaseDate?: string;
+  amazonUrl?: string; // compat con otros componentes (no se usa en la CTA)
 }
 
-/* ===== Helpers para CTA dinámico sin usar any ===== */
+/* ===== Helpers SOLO de rutas (sin tocar estilos) ===== */
+
+// basePath público que Next inyecta en build (cadena, ej: "/chimeralinsight-web" o "")
+const BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? "";
+
+// Quita el basePath si ya viene en la ruta (evita duplicarlo)
+function stripBasePath(href: string): string {
+  if (!BASE) return href;
+  if (href.startsWith(BASE + "/")) return href.slice(BASE.length);
+  if (href === BASE) return "/";
+  return href;
+}
+
+// Asegura "/" inicial y "/" final (compat con trailingSlash: true)
+function normalizeInternal(href: string): string {
+  let h = href.startsWith("/") ? href : `/${href}`;
+  if (!h.endsWith("/")) h += "/";
+  return h;
+}
+
 function isUpcoming(av?: Availability): boolean {
   return av === "upcoming";
 }
@@ -33,7 +47,6 @@ function formatMonthYearAbbrev(dateISO?: string): string {
   if (!dateISO) return "Soon";
   const [y, m, d] = dateISO.split("-").map(Number);
   const dt = new Date(Date.UTC(y, (m ?? 1) - 1, d ?? 1));
-  // Ejemplo: "Dec 2025"
   return dt.toLocaleDateString("en-US", {
     month: "short",
     year: "numeric",
@@ -41,10 +54,9 @@ function formatMonthYearAbbrev(dateISO?: string): string {
   });
 }
 
-const BookCard = ({
+export default function BookCard({
   title,
   imageUrl,
-  amazonUrl,
   bookHref,
   sectionId = "buy",
   priority = false,
@@ -52,31 +64,27 @@ const BookCard = ({
   blurDataURL,
   availability,
   releaseDate,
-}: BookCardProps) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  amazonUrl,
+}: BookCardProps) {
   const resolvedLoading: "eager" | "lazy" =
     loading ?? (priority ? "eager" : "lazy");
 
-  const hasBookPage = typeof bookHref === "string" && bookHref.length > 0;
-  const hasAmazon = typeof amazonUrl === "string" && amazonUrl.length > 0;
+  // 1) Quitar basePath si ya viene en bookHref
+  const raw = bookHref ?? "/"; // fallback
+  const noBase = stripBasePath(raw); // "/books/tao/" (sin /chimeralinsight-web)
+  // 2) Normalizar para export estático
+  const basePage = normalizeInternal(noBase); // asegura "/" inicial y final
+  // 3) Anchor opcional
+  const href = sectionId ? `${basePage}#${sectionId}` : basePage;
+  // 👉 Pasamos href SIN basePath a <Link>; Next añadirá el basePath en el HTML final.
 
-  // Si hay bookHref, construye /books/[id]#buy; si no, usa amazonUrl; si no hay nada, "#"
-  const href: string = hasBookPage
-    ? `${bookHref!}${sectionId ? `#${sectionId}` : ""}`
-    : hasAmazon
-    ? amazonUrl!
-    : "#";
-
-  // externo solo si vamos a Amazon (cuando no hay page interna)
-  const isExternal = !hasBookPage && hasAmazon;
-
-  // NUEVO: label dinámico -> "Dec 2025" si es upcoming, si no "Buy"
   const ctaLabel = isUpcoming(availability)
     ? formatMonthYearAbbrev(releaseDate)
     : "Buy";
-
   const aria = isUpcoming(availability)
     ? `Releases ${ctaLabel}`
-    : `Buy ${title}${isExternal ? " on Amazon" : ""}`;
+    : `Buy ${title}`;
 
   return (
     <div className="flex flex-col items-center justify-center shrink-0 md:shrink font-sans">
@@ -86,10 +94,10 @@ const BookCard = ({
                    hover:shadow-[0_32px_80px_-20px_rgba(0,0,0,0.45)]
                    transition-shadow duration-300 bg-black/70 backdrop-blur-lg"
       >
-        {/* Contenedor estable para la imagen */}
+        {/* Imagen (sin cambios de estilo) */}
         <div className="w-full h-96 relative rounded-2xl bg-white/10">
           <Image
-            src={withBasePath(imageUrl)}
+            src={withBasePath(imageUrl)} // mantener como lo tienes
             alt={`${title} cover`}
             fill
             className="object-contain"
@@ -110,11 +118,9 @@ const BookCard = ({
             </h3>
           </div>
 
+          {/* CTA: SIEMPRE interna con <Link>, SIN basePath en href */}
           <Link
             href={href}
-            {...(isExternal
-              ? { target: "_blank", rel: "noopener noreferrer" }
-              : {})}
             aria-label={aria}
             className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900
                        font-semibold px-6 py-3 text-lg transition-colors
@@ -126,6 +132,4 @@ const BookCard = ({
       </div>
     </div>
   );
-};
-
-export default BookCard;
+}

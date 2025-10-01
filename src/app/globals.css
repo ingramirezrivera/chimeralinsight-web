@@ -1,267 +1,201 @@
+/* src/app/globals.css */
+
+/* (Opcional si usas next/font) */
 @import url("https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&display=swap");
 
-/* ──────────────────────────────────────────────────────────
-   Tailwind layers
-   ────────────────────────────────────────────────────────── */
+/* Tailwind v4 */
 @import "tailwindcss";
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-html {
-  @apply font-sans;
-  font-size: 20px;
-  scroll-behavior: smooth;
-}
-
-@layer base {
-  h1 {
-    @apply text-4xl md:text-5xl font-bold;
-  }
-  h2 {
-    @apply text-3xl md:text-4xl font-semibold;
-  }
-  h3 {
-    @apply text-2xl md:text-3xl font-semibold;
-  }
-  h4 {
-    @apply text-xl font-medium;
-  }
-  p {
-    @apply text-base leading-relaxed;
-  }
-  small {
-    @apply text-sm;
-  }
-}
-
-/* Base de botón */
-@layer components {
-  .btn {
-    @apply inline-flex items-center justify-center
-           transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2
-           disabled:opacity-60 disabled:cursor-not-allowed select-none
-           no-underline;
-    border-radius: var(--btn-radius);
-    padding: var(--btn-pad-y) var(--btn-pad-x);
-    font-weight: var(--btn-font);
-    font-size: 1rem; /* text-base por defecto */
-  }
-  .btn-lg {
-    @apply text-lg;
-  }
-  .btn-sm {
-    @apply text-sm;
-  }
-
-  /* Variantes de función */
-  .btn-buy {
-    color: var(--buy-fg);
-    background: var(--buy-bg);
-  }
-  .btn-buy:hover {
-    background: var(--buy-bg-hover);
-  }
-
-  .btn-learn {
-    color: var(--learn-fg);
-    background: var(--learn-bg);
-  }
-  .btn-learn:hover {
-    background: var(--learn-bg-hover);
-  }
-
-  .btn-primary {
-    color: var(--primary-fg);
-    background: var(--primary-bg);
-  }
-  .btn-primary:hover {
-    background: var(--primary-bg-hover);
-  }
-
-  /* Borde/outline (opcional) */
-  .btn-outline {
-    @apply border;
-    color: var(--primary-fg);
-    background: transparent;
-    border-color: var(--primary-bg);
-  }
-  .btn-outline:hover {
-    background: color-mix(in srgb, var(--primary-bg) 15%, transparent);
-  }
-}
-
-/* ──────────────────────────────────────────────────────────
-   CSS variables (branding) – light/dark
-   ────────────────────────────────────────────────────────── */
+/* ============================
+   Variables de marca
+   ============================ */
 :root {
-  /* Background / text */
-  --bg: #f9fafb; /* gray-50 */
-  --fg: #111827; /* gray-900 */
+  --brand: #2f8185;
+  --brand-rgb: 47 129 133; /* para rgba() */
+  --brand-600: #91e3e7;
 
-  /* Brand palette — PRIMARY: #2f8185 */
-  --brand: #2f8185; /* brand base */
-  --brand-600: #91e3e7; /* hover */
-  --accent: #4aeaf3; /* accent cyan */
-  --warn: #f59e0b; /* warning amber */
+  /* Texto y fondos (como antes) */
+  --bg: #f9fafb; /* ≈ gray-50 */
+  --fg: #111827; /* ≈ gray-900 */
 
-  /* Surfaces / borders */
-  --surface: #ffffff; /* white */
-  --muted: #f3f4f6; /* gray-100 */
-  --border: #e5e7eb; /* gray-200 */
+  --surface: #ffffff;
+  --muted: #f3f4f6;
+  --border: #e5e7eb;
+  --accent: #4aeaf3;
+  --warn: #f59e0b;
 }
 
 .dark {
-  --bg: #111827; /* gray-900 */
-  --fg: #e5e7eb; /* gray-200 */
-  --surface: #18181b; /* zinc-900 */
-  --muted: #27272a; /* zinc-800 */
-  --border: #3f3f46; /* zinc-700 */
+  --bg: #111827;
+  --fg: #e5e7eb;
+  --surface: #18181b;
+  --muted: #27272a;
+  --border: #3f3f46;
 }
 
-.nav-link {
-  @apply no-underline;
-}
-
-/* Respect user preference for dark mode */
-@media (prefers-color-scheme: dark) {
-  :root:not(.light) {
-    color-scheme: dark;
-  }
-}
-
-/* ──────────────────────────────────────────────────────────
-   Base resets and typography
-   ────────────────────────────────────────────────────────── */
+/* ============================
+   Base (restaurado)
+   ============================ */
 @layer base {
   html {
-    @apply h-full scroll-smooth;
+    font-family: var(--font-roboto), ui-sans-serif, system-ui, sans-serif;
+    font-size: 20px;
+    scroll-behavior: smooth;
+    color: var(--fg); /* ← color base del texto */
   }
-
   body {
-    @apply min-h-screen antialiased;
-    font-family: "Roboto", sans-serif;
-    background-color: rgb(var(--bg));
-    color: rgb(var(--fg));
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: var(--bg);
+    color: inherit; /* hereda de html: #111827 */
   }
 
-  /* Typography */
-  h1,
-  h2,
-  h3 {
-    @apply tracking-tight;
-  }
+  /* Titulares y texto */
   h1 {
-    @apply text-4xl md:text-6xl font-bold;
+    font-weight: 700;
+    font-size: clamp(2.25rem, 2vw + 1rem, 3rem);
   }
   h2 {
-    @apply text-3xl md:text-4xl font-semibold;
+    font-weight: 600;
+    font-size: clamp(1.875rem, 1.5vw + 1rem, 2.5rem);
   }
   h3 {
-    @apply text-2xl md:text-3xl font-semibold;
+    font-weight: 600;
+    font-size: clamp(1.5rem, 1vw + 1rem, 2rem);
   }
-
+  h4 {
+    font-weight: 500;
+    font-size: 1.25rem;
+  }
+  p,
+  li,
+  small {
+    color: inherit;
+  } /* ← el texto hereda #111827 */
   p {
-    @apply leading-7 text-gray-900;
+    line-height: 1.75;
   }
 
-  /* Links use brand variables (not Tailwind emerald) */
-  a {
-    color: rgb(var(--brand));
-    @apply underline-offset-4 hover:underline;
+  /* Links: SIN subrayado por defecto; solo en hover */
+  a,
+  a:visited {
+    color: var(--brand);
+    text-decoration: none !important; /* sin underline nunca */
   }
-  a:hover {
-    color: rgb(var(--brand-600));
+  a:hover,
+  a:focus-visible {
+    color: var(--brand-600); /* solo cambia el color en hover */
+    text-decoration: none !important; /* sin underline tampoco aquí */
   }
 
-  /* Text selection */
   ::selection {
-    background: rgba(var(--brand), 0.25);
+    background: rgba(var(--brand-rgb), 0.25);
   }
-
-  /* Accessible focus styles */
   :focus-visible {
     outline: none;
-    box-shadow: 0 0 0 3px rgba(var(--brand), 0.45);
+    box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.45);
     border-radius: 0.5rem;
   }
 
-  /* Minimal custom scrollbar (webkit) */
+  /* Scrollbar (webkit) */
   *::-webkit-scrollbar {
     width: 10px;
     height: 10px;
   }
   *::-webkit-scrollbar-thumb {
-    background: rgb(var(--border));
+    background: var(--border);
     border-radius: 9999px;
   }
   *::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--muted));
+    background: var(--muted);
   }
 }
 
-/* ──────────────────────────────────────────────────────────
+/* ============================
    Component helpers
-   ────────────────────────────────────────────────────────── */
-@layer components {
-  /* Consistent container for sections */
+   ============================ */
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 80rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+@media (min-width: 640px) {
   .container {
-    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
-
-  /* Buttons */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-medium transition;
-  }
-
-  .btn-primary {
-    background-color: rgb(var(--brand));
-    color: white;
-  }
-  .btn-primary:hover {
-    background-color: rgb(var(--brand-600));
-  }
-
-  .btn-outline {
-    @apply border;
-    border-color: rgb(var(--brand));
-    color: rgb(var(--brand));
-    background-color: transparent;
-  }
-  .btn-outline:hover {
-    background-color: rgba(var(--brand), 0.06);
-  }
-
-  /* Card */
-  .card {
-    @apply rounded-2xl shadow-md border;
-    background-color: rgb(var(--surface));
-    border-color: rgb(var(--border));
-  }
-
-  /* Form controls (if not using @tailwindcss/forms) */
-  .input {
-    @apply w-full rounded-xl border px-3 py-2 outline-none transition;
-    background-color: rgb(var(--surface));
-    border-color: rgb(var(--border));
-  }
-  .input:focus {
-    box-shadow: 0 0 0 3px rgba(var(--brand), 0.25);
-    border-color: rgb(var(--brand));
+}
+@media (min-width: 1024px) {
+  .container {
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
-/* ──────────────────────────────────────────────────────────
-   Extra utilities
-   ────────────────────────────────────────────────────────── */
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-  .border-subtle {
-    border-color: rgb(var(--border));
-  }
-  .transition-base {
-    transition: all 0.2s ease;
-  }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.75rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+.btn-primary {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-primary:hover {
+  background: var(--brand-600);
+}
+
+.btn-outline {
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  background: transparent;
+}
+.btn-outline:hover {
+  background: color-mix(in srgb, var(--brand) 6%, transparent);
+}
+
+.card {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 4, 6, 0.05);
+}
+
+.input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  outline: none;
+  transition: all 0.2s ease;
+  background: var(--surface);
+}
+.input:focus {
+  box-shadow: 0 0 0 3px rgba(var(--brand-rgb), 0.25);
+  border-color: var(--brand);
+}
+
+/* Utilidades pequeñas */
+.text-balance {
+  text-wrap: balance;
+}
+.border-subtle {
+  border-color: var(--border);
+}
+.transition-base {
+  transition: all 0.2s ease;
+}
+
+/* Por si algún link del navbar usa clase propia */
+.nav-link {
+  text-decoration: none !important;
 }

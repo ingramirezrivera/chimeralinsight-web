@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { books as defaultBooks } from "@/data/books";
-import { withBasePath } from "@/lib/paths";
 
 type Retailer = { id: string; label: string; url: string };
 
@@ -210,10 +209,9 @@ export default function BooksSection({
               ? formatMonthYearAbbrev(b.releaseDate)
               : buyLabel;
 
-            // upcoming → /launch/[id]/ ; otherwise Amazon/modal
-            const ctaHref = upcoming
-              ? withBasePath(`/launch/${b.id}/`)
-              : b.amazonUrl ?? "#";
+            // ❗ INTERNALS: NUNCA prefix con withBasePath cuando uses <Link>.
+            // upcoming → /launch/[id]/  (con slash final)
+            const ctaHref = upcoming ? `/launch/${b.id}/` : b.amazonUrl ?? "#";
 
             const ctaAria = upcoming
               ? `View ${b.title} pre-launch`
@@ -235,8 +233,9 @@ export default function BooksSection({
                 <div className="flex flex-col md:flex-row md:items-start md:gap-8">
                   <div className="mx-auto md:mx-0 shrink-0">
                     <div className="relative h-96 w-60 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
+                      {/* next/image: NO withBasePath */}
                       <Image
-                        src={withBasePath(b.coverSrc)}
+                        src={b.coverSrc}
                         alt={`${b.title} cover`}
                         fill
                         className="rounded shadow-md object-cover"
@@ -260,6 +259,7 @@ export default function BooksSection({
                     )}
 
                     <div className="m-6 flex flex-wrap items-center justify-center md:justify-start gap-3">
+                      {/* CTA principal */}
                       <CTA
                         href={ctaHref}
                         ariaLabel={ctaAria}
@@ -271,8 +271,9 @@ export default function BooksSection({
                         {dynamicBuyLabel}
                       </CTA>
 
+                      {/* Learn more → /books/[id]/ (con slash final) */}
                       <CTA
-                        href={withBasePath(`/books/${b.id}/`)}
+                        href={`/books/${b.id}/`}
                         ariaLabel={`Learn more about ${b.title}`}
                         variant="custom"
                         fullWidth

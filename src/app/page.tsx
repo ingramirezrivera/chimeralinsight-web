@@ -11,7 +11,7 @@ export default function Home() {
     <main id="top">
       <section id="home">
         <Hero
-          imageUrl={withBasePath("/images/ChimInsightBanner.png")}
+          imageUrl="/images/ChimInsightBanner.png"
           altText="Imagen de fondo de un desierto con elementos de ciencia ficción y mitología"
           sealLogoUrl="/images/seal-chimeralInsight.png"
           sealLogoAltText="ChimeralInsight Seal Logo"
@@ -23,7 +23,7 @@ export default function Home() {
       <BooksCarousel />
 
       <section id="about">
-        <AboutAuthor photoUrl={withBasePath("/images/author-robin.png")} />
+        <AboutAuthor photoUrl="/images/author-robin.png" />
       </section>
 
       <section id="books">
