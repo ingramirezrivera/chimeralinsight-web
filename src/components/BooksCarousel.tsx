@@ -1,4 +1,3 @@
-// src/components/BooksCarousel.tsx
 "use client";
 
 import { useRef, useEffect } from "react";
@@ -45,7 +44,7 @@ export default function BooksCarousel() {
           className="
     absolute left-1/2 -translate-x-1/2 w-[104vw] inset-y-0
     -z-10 bg-[var(--brand)]
-  "
+"
           style={{
             clipPath: "polygon(0 0,100% 0,100% 90%,50% 100%,0 90%)",
           }}
@@ -82,6 +81,7 @@ export default function BooksCarousel() {
             "scroll-p-4",
             "scroll-smooth",
             "[-webkit-overflow-scrolling:touch]",
+            "no-scrollbar", // <--- AÑADIDO: Esta clase oculta el scrollbar horizontal en el carrusel
           ].join(" ")}
         >
           {books.map((book, i) => {
