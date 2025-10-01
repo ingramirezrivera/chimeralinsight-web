@@ -68,7 +68,7 @@ export default async function LaunchPage({
   const book = findBook(id);
   if (!book) notFound();
 
-  // ⬇️ En export estático, mantén el basePath en el redirect
+  // En export estático, mantén el basePath en el redirect
   if (book.availability !== "upcoming") {
     redirect(withBasePath(`/books/${id}/`));
   }
@@ -98,9 +98,9 @@ export default async function LaunchPage({
             {/* Cover */}
             <div className="md:col-span-5">
               <div className="relative aspect-[3/4] w-full max-w-[420px] mx-auto overflow-hidden rounded-2xl shadow">
-                {/* next/image: NO withBasePath */}
+                {/* next/image: con basePath explícito para GH Pages */}
                 <Image
-                  src={book.coverSrc}
+                  src={withBasePath(book.coverSrc)}
                   alt={`${book.title} cover`}
                   fill
                   className="object-contain"
