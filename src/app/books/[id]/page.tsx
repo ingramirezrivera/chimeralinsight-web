@@ -45,7 +45,7 @@ export async function generateMetadata({
   return {
     title: `${book.title} | Chimeralinsight`,
     description: desc,
-    // Canonical con basePath sí (esto es meta, no navegación)
+    // Canonical con basePath (meta, no navegación)
     alternates: { canonical: withBasePath(`/books/${book.id}/`) },
   };
 }
@@ -87,7 +87,7 @@ export default async function BookPage({
       {/* Header */}
       <header className="bg-[var(--brand)] bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          {/* ⬇️ INTERNAL: usar Link sin withBasePath */}
+          {/* INTERNAL: Link sin withBasePath (Next aplica basePath automáticamente) */}
           <Link href="/" className="no-underline hover:no-underline">
             <span className="text-lg font-semibold hover:opacity-90">
               ← Back to Home
@@ -106,9 +106,9 @@ export default async function BookPage({
             {/* Cover */}
             <div className="md:col-span-4">
               <div className="relative aspect-[3/4] w-full max-w-[360px] md:max-w-none mx-auto overflow-hidden">
-                {/* ⬇️ next/image: NO withBasePath */}
+                {/* next/image: con basePath explícito para GH Pages */}
                 <Image
-                  src={book.coverSrc}
+                  src={withBasePath(book.coverSrc)}
                   alt={`${book.title} cover`}
                   fill
                   className="object-contain"
@@ -144,7 +144,7 @@ export default async function BookPage({
                     <span className="inline-flex items-center rounded-lg bg-yellow-500 text-white px-3 py-1 text-md font-semibold">
                       Coming Soon — {formatRelease(book.releaseDate)}
                     </span>
-                    {/* ⬇️ INTERNAL: Link sin withBasePath, con slash final */}
+                    {/* INTERNAL: Link sin withBasePath, con slash final */}
                     <Link
                       href={`/launch/${book.id}/`}
                       className="rounded-lg bg-yellow-500 hover:bg-yellow-400 w-48 text-center text-white
@@ -188,9 +188,9 @@ export default async function BookPage({
                 rel="noopener noreferrer"
                 className="block w-64 md:w-96"
               >
-                {/* ⬇️ next/image: NO withBasePath */}
+                {/* next/image: con basePath explícito */}
                 <Image
-                  src="/images/amazon-logo.png"
+                  src={withBasePath("/images/amazon-logo.png")}
                   alt="Amazon Logo"
                   width={384}
                   height={96}
