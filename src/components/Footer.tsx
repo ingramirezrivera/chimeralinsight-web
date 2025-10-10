@@ -3,6 +3,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 type NavItem = { label: string; href: string };
 
@@ -39,13 +40,30 @@ const smoothScrollTo = (to: number, duration = 450) => {
 export default function Footer() {
   const year = new Date().getFullYear();
   const pathname = usePathname();
+  const [hash, setHash] = useState<string>("");
 
-  // Marca activo solo para rutas "reales" (no anclas del home)
+  // Detecta cambios en el hash (#about, #books, etc.)
+  useEffect(() => {
+    const update = () => setHash(window.location.hash || "");
+    update();
+    window.addEventListener("hashchange", update);
+    return () => window.removeEventListener("hashchange", update);
+  }, []);
+
+  // Determina si un enlace está activo (excepto Home que no se resalta)
   const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    if (href.startsWith("/#") || href.startsWith("#")) return false;
-    const base = href.split("#")[0];
-    return pathname === base || pathname.startsWith(base + "/");
+    // Rutas "reales" (no anclas)
+    if (!href.startsWith("/#") && !href.startsWith("#")) {
+      if (href === "/") {
+        // Home: nunca usar estilo "activo"
+        return false;
+      }
+      const base = href.split("#")[0];
+      return pathname === base || pathname.startsWith(base + "/");
+    }
+    // Anclas del home
+    const target = "#" + href.split("#")[1];
+    return pathname === "/" && hash === target;
   };
 
   // Intercepta clics para scroll suave desde el Footer cuando ya estás en "/"
@@ -78,8 +96,7 @@ export default function Footer() {
       history.replaceState(null, "", id);
       return;
     }
-
-    // Si no estás en home, deja que Next navegue normalmente
+    // Si no estás en home, Next navega normal
   };
 
   return (
@@ -121,9 +138,11 @@ export default function Footer() {
                     href={item.href}
                     onClick={(e) => handleFooterClick(e, item.href)}
                     className={[
-                      "inline-block text-sm no-underline hover:no-underline focus:no-underline",
-                      "transition duration-200 ease-in-out hover:scale-110", // hover SIEMPRE
-                      isActive(item.href)
+                      "inline-block text-sm no-underline hover:no-underline focus:no-underline transition duration-200 ease-in-out hover:scale-110",
+                      // Home siempre blanco; los demás usan activo/normal
+                      item.href === "/"
+                        ? "text-white hover:text-[var(--brand-600)]"
+                        : isActive(item.href)
                         ? "text-[var(--accent)] hover:opacity-90"
                         : "text-gray-300 hover:text-[var(--brand-600)]",
                     ].join(" ")}

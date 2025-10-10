@@ -14,7 +14,7 @@ export default function BooksCarousel() {
     const el = trackRef.current;
     if (!el || books.length === 0) return;
 
-    const middleIndex = Math.floor(books.length / 2);
+    const middleIndex = Math.floor(books.length / 3);
     const child = el.children.item(middleIndex) as HTMLElement | null;
     if (!child) return;
 
