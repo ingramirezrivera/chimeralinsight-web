@@ -22,7 +22,7 @@ export default function Hero({
 }: HeroProps) {
   return (
     <div
-      className="mt-12 relative w-full h-[30rem] md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2 font-sans"
+      className="mt-14 relative w-full h-[30rem] md:h-[800px] bg-cover bg-center flex items-center justify-center pt-16 sm:pt-2 font-sans"
       style={{ backgroundImage: `url(${withBasePath(imageUrl)})` }}
       aria-label={altText}
     >
