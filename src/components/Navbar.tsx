@@ -11,7 +11,7 @@ const links = [
   { href: "/#about", label: "About" },
   { href: "/#books", label: "Books" },
   { href: "/#mailing-list", label: "Mailing List" },
-  { href: "/#presskit", label: "Press Kit" },
+  { href: "/presskit", label: "Press Kit" },
 ];
 
 const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
@@ -207,7 +207,7 @@ export default function Navbar() {
         ref={headerRef}
         data-nav="true"
         className={[
-          "fi top-0 left-0 right-0 z-50 font-sans",
+          "fixed top-0 left-0 right-0 z-50 font-sans",
           "bg-[var(--brand,#0f766e)]",
           "lg:transition lg:duration-300",
           scrolled
@@ -282,7 +282,7 @@ export default function Navbar() {
         {open && (
           <div
             id="mobile-menu"
-            className="lg:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
+            className="lg:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]/85 backdrop-blur-md shadow-xl"
           >
             <ul className="divide-y divide-[var(--brand-600,#0891b2)]">
               {links.map((link) => (

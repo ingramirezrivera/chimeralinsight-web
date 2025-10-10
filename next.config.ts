@@ -5,6 +5,6 @@ export default {
   output: "export",
   trailingSlash: true,
   images: { unoptimized: true },
-  basePath: isProd ? `/${repo}` : "", // ← prefijo sólo en prod
+  basePath: isProd ? `/${repo}` : "",   // ← prefijo sólo en prod
   env: { NEXT_PUBLIC_BASE_PATH: isProd ? `/${repo}` : "" },
 };

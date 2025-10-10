@@ -231,20 +231,33 @@ export default function BooksSection({
                 className="rounded-2xl border border-none bg-[var(--brand)] p-4 sm:p-6 shadow-xl"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:gap-8">
+                  {/* Portada 3:4 sin recortes */}
                   <div className="mx-auto md:mx-0 shrink-0">
-                    <div className="relative h-96 w-60 sm:h-64 md:h-80 lg:h-96 aspect-[3/4]">
-                      {/* ⬅️ AQUI el fix: prefijar basePath para GH Pages */}
+                    <div
+                      className="
+                        relative aspect-[3/4]
+                        w-44 sm:w-48 md:w-56 lg:w-60 xl:w-64
+                        rounded-xl 
+                      "
+                    >
                       <Image
                         src={withBasePath(b.coverSrc)}
                         alt={`${b.title} cover`}
                         fill
-                        className="rounded shadow-md object-cover"
-                        sizes="(max-width: 768px) 256px, 384px"
+                        className="object-contain"
+                        sizes="
+                          (max-width: 640px) 11rem,
+                          (max-width: 768px) 12rem,
+                          (max-width: 1024px) 14rem,
+                          (max-width: 1280px) 15rem,
+                          16rem
+                        "
                         priority={false}
                       />
                     </div>
                   </div>
 
+                  {/* Texto + CTAs */}
                   <div className="mt-5 md:mt-10 font-medium flex-1 text-white/95">
                     <h3 className="text-xl md:text-2xl">{b.title}</h3>
 
@@ -264,7 +277,7 @@ export default function BooksSection({
                         ariaLabel={ctaAria}
                         variant="custom"
                         fullWidth
-                        className="rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
+                        className="min-w-[200px] text-center rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-8 py-4 text-lg transition-colors mt-4 md:mt-0 md:w-auto"
                         onClick={ctaOnClick}
                       >
                         {dynamicBuyLabel}
@@ -275,7 +288,7 @@ export default function BooksSection({
                         ariaLabel={`Learn more about ${b.title}`}
                         variant="custom"
                         fullWidth
-                        className="rounded-lg bg-gray-700/50 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors text-center mt-4 md:mt-0 md:w-auto"
+                        className="min-w-[200px] text-center rounded-lg bg-gray-700/50 hover:bg-gray-600 text-white font-semibold px-8 py-4 text-lg transition-colors mt-4 md:mt-0 md:w-auto"
                       >
                         {learnMoreLabel}
                       </CTA>
