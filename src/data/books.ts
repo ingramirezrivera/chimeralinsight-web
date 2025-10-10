@@ -61,7 +61,7 @@ Superstition, coded messages and drug induced visions of the dead, combine to cr
   },
   {
     id: "vaccine",
-    title: "Vaccine: A Terrorism Thriller",
+    title: "Vaccine",
     subtitle: "",
     description:
       "War kills in many ways—with speed, with brutality…with stealth. At the end of the 20th century, America prepares for a war that could transform the world. But that war has already been fought. . .and America has lost. In the lingering chaos of the Middle East conflict, a pathogen is unleashed. This plague has been engineered to suffocate its...",

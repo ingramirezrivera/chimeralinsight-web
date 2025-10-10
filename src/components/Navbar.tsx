@@ -11,7 +11,7 @@ const links = [
   { href: "/#about", label: "About" },
   { href: "/#books", label: "Books" },
   { href: "/#mailing-list", label: "Mailing List" },
-  { href: "/presskit", label: "Presskit" },
+  { href: "/#presskit", label: "Press Kit" },
 ];
 
 const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
@@ -41,7 +41,7 @@ const getNavHeight = () => {
   const parsed = parseInt(v, 10);
   if (Number.isFinite(parsed) && parsed > 0) return parsed;
   const header = document.querySelector<HTMLElement>("header[data-nav='true']");
-  return header?.offsetHeight ?? 62; // fallback coherente con tu Footer
+  return header?.offsetHeight ?? 62;
 };
 
 export default function Navbar() {
@@ -69,7 +69,7 @@ export default function Navbar() {
     setVars();
     window.addEventListener("resize", setVars);
     window.addEventListener("load", setVars);
-    const t = setTimeout(setVars, 50); // por si el logo/fuente tarda
+    const t = setTimeout(setVars, 50);
     return () => {
       window.removeEventListener("resize", setVars);
       window.removeEventListener("load", setVars);
@@ -83,9 +83,9 @@ export default function Navbar() {
     document.documentElement.style.setProperty("--nav-h", `${h}px`);
   }, [open]);
 
-  // Efecto de fondo al hacer scroll (solo desktop)
+  // Efecto de fondo al hacer scroll (solo desktop >= lg)
   useEffect(() => {
-    const mql = window.matchMedia("(min-width: 768px)");
+    const mql = window.matchMedia("(min-width: 1024px)"); // lg
     const onScroll = () => setScrolled(window.scrollY > 8);
     const attach = () => {
       if (mql.matches) {
@@ -178,7 +178,6 @@ export default function Navbar() {
       const hash = href.replace("/#", "#");
 
       if (onHome) {
-        // Ya en Home: medir después de cerrar menú y desplazar
         requestAnimationFrame(() => {
           const el = document.querySelector<HTMLElement>(hash);
           if (!el) return;
@@ -188,7 +187,6 @@ export default function Navbar() {
           history.replaceState(null, "", hash);
         });
       } else {
-        // Viniendo de otra ruta: navegar y ajustar al pintar
         router.push("/" + hash);
         setTimeout(() => {
           const el = document.querySelector<HTMLElement>(hash);
@@ -200,8 +198,7 @@ export default function Navbar() {
       }
       return;
     }
-
-    // Rutas reales (páginas) → dejar que Next navegue normal
+    // Rutas reales → Next navega normal
   };
 
   return (
@@ -210,15 +207,15 @@ export default function Navbar() {
         ref={headerRef}
         data-nav="true"
         className={[
-          "sticky top-0 left-0 right-0 z-50 font-sans",
+          "fi top-0 left-0 right-0 z-50 font-sans",
           "bg-[var(--brand,#0f766e)]",
-          "md:transition md:duration-300",
+          "lg:transition lg:duration-300",
           scrolled
-            ? "md:bg-[var(--brand,#0f766e)]/80 md:backdrop-blur md:shadow-md"
-            : "md:bg-[var(--brand,#0f766e)] md:shadow-lg",
+            ? "lg:bg-[var(--brand,#0f766e)]/80 lg:backdrop-blur lg:shadow-md"
+            : "lg:bg-[var(--brand,#0f766e)] lg:shadow-lg",
         ].join(" ")}
       >
-        <nav className="container mx-auto h-20 md:h-14 flex items-center justify-between md:justify-center px-4 md:px-10">
+        <nav className="container mx-auto h-20 lg:h-14 flex items-center justify-between lg:justify-center px-4 lg:px-10">
           {/* LOGO */}
           <Link
             href="/"
@@ -233,13 +230,13 @@ export default function Navbar() {
               alt="Chimeralinsight logo"
               width={340}
               height={60}
-              className="h-auto w-64 md:w-64 transition-transform duration-200 ease-in-out hover:scale-110"
+              className="h-auto w-64 lg:w-64 transition-transform duration-200 ease-in-out hover:scale-110"
               priority
             />
           </Link>
 
-          {/* Desktop links */}
-          <ul className="hidden md:flex items-center gap-8 pl-10">
+          {/* Links Desktop (solo ≥ lg) */}
+          <ul className="hidden lg:flex items-center gap-8 pl-10">
             {links.map((link) => (
               <li key={link.href}>
                 <Link
@@ -258,9 +255,9 @@ export default function Navbar() {
             ))}
           </ul>
 
-          {/* Botón móvil */}
+          {/* Botón hamburguesa (visible en móviles y tablets: < lg) */}
           <button
-            className="md:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600,#0891b2)]"
+            className="lg:hidden inline-flex items-center justify-center rounded-lg p-2 text-white hover:bg-[var(--brand-600,#0891b2)]"
             onClick={() => setOpen((v) => !v)}
             aria-label="Toggle menu"
             aria-expanded={open}
@@ -281,11 +278,11 @@ export default function Navbar() {
           </button>
         </nav>
 
-        {/* Menú móvil */}
+        {/* Menú móvil/tablet (< lg) */}
         {open && (
           <div
             id="mobile-menu"
-            className="md:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
+            className="lg:hidden border-t border-[var(--brand-600,#0891b2)] bg-[var(--brand,#0f766e)]"
           >
             <ul className="divide-y divide-[var(--brand-600,#0891b2)]">
               {links.map((link) => (
