@@ -11,7 +11,7 @@ const links = [
   { href: "/#about", label: "About" },
   { href: "/#books", label: "Books" },
   { href: "/#mailing-list", label: "Mailing List" },
-  { href: "/#presskit", label: "Press Kit" },
+  { href: "/presskit", label: "Press Kit" },
 ];
 
 const SECTION_IDS = ["top", "about", "books", "mailing-list"] as const;
