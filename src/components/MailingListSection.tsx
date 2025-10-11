@@ -14,8 +14,8 @@ interface Props {
 
 export default function MailingListSection({
   title = "Get Free Bonus Content!",
-  blurbTop = "Join my mailing list to receive bonus content from my book,",
-  blurbBottom = "Vaccine: A Terrorism Thriller, for free!",
+  blurbTop = "Join my mailing list to receive bonus content from my books, starting with",
+  blurbBottom = "Vaccine: A Terrorism Thriller - all for free!",
   ctaText = "Get My Free Bonus Content",
   subscribeUrl,
 }: Props) {

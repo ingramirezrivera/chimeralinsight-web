@@ -212,7 +212,7 @@ export default function ContactPage() {
                   <span className="block text-white/80 text-sm">Follow</span>
                   <div className="mt-3 flex items-center gap-3">
                     <a
-                      href="https://www.facebook.com/TU_USUARIO"
+                      href="https://www.facebook.com/profile.php?id=61573030175351"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/15 hover:bg-white/25 transition"
