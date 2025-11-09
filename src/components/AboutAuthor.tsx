@@ -13,7 +13,7 @@ interface AboutAuthorProps {
 
 export default function AboutAuthor({
   name = "Robin C. Rickards",
-  photoUrl = "/images/author-robin.png",
+  photoUrl = "/images/author-robin.jpg",
   sealUrl = "/images/robinr-logo.png",
 }: AboutAuthorProps) {
   return (

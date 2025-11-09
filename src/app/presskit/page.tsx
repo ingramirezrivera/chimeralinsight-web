@@ -85,7 +85,7 @@ export default function PresskitPage() {
                   <div className="md:col-span-2">
                     <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-white ring-1 ring-black/5">
                       <Image
-                        src={withBasePath("/images/author-robin.png")} // ✅
+                        src={withBasePath("/images/author-robin.jpg")} // ✅
                         alt="Author headshot"
                         fill
                         className="object-contain"

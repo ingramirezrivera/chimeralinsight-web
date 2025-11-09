@@ -179,7 +179,7 @@ export default function Footer() {
               </span>
               <div className="mt-3 flex items-center justify-center gap-3">
                 <a
-                  href="https://www.facebook.com/TU_USUARIO"
+                  href="https://www.facebook.com/profile.php?id=61573030175351"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition"

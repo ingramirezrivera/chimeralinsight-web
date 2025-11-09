@@ -1,20 +1,29 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useLayoutEffect, useState } from "react";
 import Image from "next/image";
 import BookCard from "./BookCard";
 import { books } from "@/data/books";
 import { withBasePath } from "@/lib/paths";
 
+// Tipamos "Book" a partir de tus datos reales.
+// Si ya exportas un tipo en "@/data/books", úsalo. Esto es seguro y no rompe nada.
+type Book = (typeof books)[number];
+
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // ready = ya calculamos padding + centrado
+  const [ready, setReady] = useState(false);
+  // Mantiene altura mientras está oculto para evitar salto de página
+  const [trackHeight, setTrackHeight] = useState<number | null>(null);
 
   // --- util: centra el elemento del medio
   const centerMiddle = () => {
     const el = trackRef.current;
     if (!el || books.length === 0) return;
 
-    const middleIndex = Math.floor(books.length / 3);
+    const middleIndex = Math.floor(books.length / 2);
     const child = el.children.item(middleIndex) as HTMLElement | null;
     if (!child) return;
 
@@ -31,11 +40,39 @@ export default function BooksCarousel() {
     if (!first) return;
 
     const sidePad = Math.max((el.clientWidth - first.clientWidth) / 2, 0);
-    // Publicamos en una CSS var del propio track
     el.style.setProperty("--side-pad", `${sidePad}px`);
   };
 
-  // Centrar al montar y cuando cargan imágenes
+  // --- Centrado inicial ANTES del primer render visible
+  useLayoutEffect(() => {
+    const el = trackRef.current;
+    if (!el || books.length === 0) return;
+
+    // Guardamos altura estimada para reservar espacio y evitar “salto”
+    // Si aún no hay hijos, usa un fallback razonable
+    const firstChild = el.children.item(0) as HTMLElement | null;
+    const estimated = firstChild?.offsetHeight ?? 420;
+    setTrackHeight(estimated + 56 /* padding inferior pb-14 aprox */);
+
+    // Desactiva cualquier suavizado SOLO para el ajuste inicial (sin usar "any")
+    const prevBehavior = el.style.getPropertyValue("scroll-behavior");
+    el.style.setProperty("scroll-behavior", "auto");
+
+    computeEdgePadding();
+    centerMiddle();
+
+    // Restaurar comportamiento previo
+    if (prevBehavior) {
+      el.style.setProperty("scroll-behavior", prevBehavior);
+    } else {
+      el.style.removeProperty("scroll-behavior");
+    }
+
+    // Habilitar render visible en el siguiente frame (ya centrado)
+    requestAnimationFrame(() => setReady(true));
+  }, []);
+
+  // --- Recalcular al cargar imágenes y al hacer resize
   useEffect(() => {
     const el = trackRef.current;
     if (!el || books.length === 0) return;
@@ -43,42 +80,40 @@ export default function BooksCarousel() {
     const handleAfterLayout = () => {
       computeEdgePadding();
       centerMiddle();
+      // Actualiza altura reservada (por si cambia con imágenes)
+      const firstChild = el.children.item(0) as HTMLElement | null;
+      if (firstChild) setTrackHeight(firstChild.offsetHeight + 56);
     };
 
-    // 1) Al montar
     handleAfterLayout();
 
-    // 2) Recalcular al cargar cada imagen dentro del carrusel (por posibles cambios de tamaño)
     const imgs = Array.from(el.querySelectorAll("img"));
     const pending = imgs.filter((img) => !img.complete);
-    let loadedCount = 0;
 
     const onImgLoad = () => {
-      loadedCount += 1;
-      // Recalcular padding y recentrar cuando terminen de cargar varias
-      computeEdgePadding();
-      centerMiddle();
+      handleAfterLayout();
     };
 
-    pending.forEach((img) => img.addEventListener("load", onImgLoad));
-    // Por si hubo errores de carga
-    pending.forEach((img) => img.addEventListener("error", onImgLoad));
+    pending.forEach((img) => {
+      img.addEventListener("load", onImgLoad);
+      img.addEventListener("error", onImgLoad);
+    });
 
-    // 3) Recalcular en cada resize
     const onResize = () => {
-      computeEdgePadding();
-      centerMiddle();
+      handleAfterLayout();
     };
     window.addEventListener("resize", onResize);
 
     return () => {
-      pending.forEach((img) => img.removeEventListener("load", onImgLoad));
-      pending.forEach((img) => img.removeEventListener("error", onImgLoad));
+      pending.forEach((img) => {
+        img.removeEventListener("load", onImgLoad);
+        img.removeEventListener("error", onImgLoad);
+      });
       window.removeEventListener("resize", onResize);
     };
   }, []);
 
-  // Scroll con botones laterales (solo mobile)
+  // --- Scroll con botones laterales (solo mobile)
   const scrollByDir = (dir: "left" | "right") => {
     const el = trackRef.current;
     if (!el) return;
@@ -125,30 +160,59 @@ export default function BooksCarousel() {
           ›
         </button>
 
+        {/* Placeholder / Skeleton mientras no está listo */}
+        {!ready && (
+          <div
+            className="relative z-20 -translate-y-12 md:-translate-y-16 px-16 md:px-32"
+            style={{ minHeight: trackHeight ?? 420 }}
+            aria-hidden="true"
+          >
+            <div className="mx-auto max-w-5xl">
+              <div className="grid grid-flow-col auto-cols-[minmax(180px,220px)] gap-8 md:gap-16 justify-center">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="rounded-xl ring-1 ring-white/10 bg-white/10 animate-pulse"
+                    style={{ aspectRatio: "3/4" }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Carrusel */}
         <div
           ref={trackRef}
           className={[
             "relative z-30",
             "-translate-y-12 md:-translate-y-16",
-            "flex flex-nowrap", // una sola fila
-            "justify-start", // el centrado real lo da el edge padding + snap-center
+            "flex flex-nowrap",
+            "justify-start",
             "gap-8 md:gap-16",
             "overflow-x-auto overflow-y-visible",
-            "snap-x snap-mandatory snap-always",
+            // snap y smooth sólo visibles cuando ya está centrado
+            ready ? "snap-x snap-mandatory snap-always scroll-smooth" : "",
             "pb-14",
             "scroll-p-4",
-            "scroll-smooth",
             "[-webkit-overflow-scrolling:touch]",
             "no-scrollbar",
+            // Oculto hasta que esté centrado (sin “brinco”); mantiene el layout con height reservado
+            ready
+              ? "opacity-100 pointer-events-auto"
+              : "opacity-0 pointer-events-none",
+            "transition-opacity duration-200",
           ].join(" ")}
-          // ⬇️ Línea clave: padding lateral dinámico con CSS var calculada en JS
           style={{
             paddingLeft: "var(--side-pad, 4rem)",
             paddingRight: "var(--side-pad, 4rem)",
+            minHeight: ready ? undefined : trackHeight ?? 420,
+            // Forzamos behavior inicial a 'auto' aunque haya estilos globales
+            scrollBehavior: ready ? undefined : "auto",
           }}
+          aria-busy={!ready}
         >
-          {books.map((book, i) => {
+          {books.map((book: Book, i: number) => {
             const isPriority = isPriorityIndex(i);
             const imgLoading = isPriority ? "eager" : "lazy";
 
@@ -156,7 +220,7 @@ export default function BooksCarousel() {
             const cardHref = isUpcoming
               ? withBasePath(`/launch/${book.id}/`)
               : withBasePath(`/books/${book.id}/`);
-            const section = isUpcoming ? "" : "buy"; // evita #buy en launch
+            const section = isUpcoming ? "" : "buy";
 
             return (
               <div key={book.id} className="snap-center shrink-0">
