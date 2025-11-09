@@ -6,6 +6,10 @@ import BookCard from "./BookCard";
 import { books } from "@/data/books";
 import { withBasePath } from "@/lib/paths";
 
+// Tipamos "Book" a partir de tus datos reales.
+// Si ya exportas un tipo en "@/data/books", úsalo. Esto es seguro y no rompe nada.
+type Book = (typeof books)[number];
+
 export default function BooksCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
 
@@ -50,15 +54,19 @@ export default function BooksCarousel() {
     const estimated = firstChild?.offsetHeight ?? 420;
     setTrackHeight(estimated + 56 /* padding inferior pb-14 aprox */);
 
-    // Desactiva cualquier suavizado SOLO para el ajuste inicial
-    const prevBehavior = (el.style as any).scrollBehavior;
-    (el.style as any).scrollBehavior = "auto";
+    // Desactiva cualquier suavizado SOLO para el ajuste inicial (sin usar "any")
+    const prevBehavior = el.style.getPropertyValue("scroll-behavior");
+    el.style.setProperty("scroll-behavior", "auto");
 
     computeEdgePadding();
     centerMiddle();
 
     // Restaurar comportamiento previo
-    (el.style as any).scrollBehavior = prevBehavior || "";
+    if (prevBehavior) {
+      el.style.setProperty("scroll-behavior", prevBehavior);
+    } else {
+      el.style.removeProperty("scroll-behavior");
+    }
 
     // Habilitar render visible en el siguiente frame (ya centrado)
     requestAnimationFrame(() => setReady(true));
@@ -152,7 +160,7 @@ export default function BooksCarousel() {
           ›
         </button>
 
-        {/* Placeholder / Skeleton mientras no está listo (opcional, no cambia diseño final) */}
+        {/* Placeholder / Skeleton mientras no está listo */}
         {!ready && (
           <div
             className="relative z-20 -translate-y-12 md:-translate-y-16 px-16 md:px-32"
@@ -204,7 +212,7 @@ export default function BooksCarousel() {
           }}
           aria-busy={!ready}
         >
-          {books.map((book, i) => {
+          {books.map((book: Book, i: number) => {
             const isPriority = isPriorityIndex(i);
             const imgLoading = isPriority ? "eager" : "lazy";
 
