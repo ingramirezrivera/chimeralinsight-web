@@ -1,36 +1,40 @@
 import { NextResponse } from "next/server";
 
-// --- 👇 código de rate limit (puede ir arriba del handler)
-const hits = new Map<string, { count: number; ts: number }>();
-const WINDOW_MS = 60_000; // 1 minuto
-const LIMIT = 20; // máximo 20 solicitudes por minuto
-
-function tooMany(req: Request) {
-  const ip = (req.headers.get("x-forwarded-for") || "local")
-    .split(",")[0]
-    .trim();
-  const now = Date.now();
-  const rec = hits.get(ip) ?? { count: 0, ts: now };
-
-  if (now - rec.ts > WINDOW_MS) {
-    rec.count = 0;
-    rec.ts = now;
-  }
-
-  rec.count++;
-  hits.set(ip, rec);
-  return rec.count > LIMIT;
+export async function GET() {
+  return NextResponse.json({ ok: true, method: "GET alive" }, { status: 200 });
 }
 
-// --- 👇 handler principal
 export async function POST(req: Request) {
-  // ✅ coloca aquí la verificación ANTES de cualquier otra lógica
-  if (tooMany(req)) {
+  try {
+    const { email, hp } = await req.json();
+    if (hp) return NextResponse.json({ ok: true }, { status: 200 });
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return NextResponse.json({ error: "Email inválido" }, { status: 400 });
+    }
+    const mlRes = await fetch(
+      "https://connect.mailerlite.com/api/subscribers",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${process.env.MAILERLITE_API_KEY}`,
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
+    if (!mlRes.ok) {
+      const text = await mlRes.text();
+      return NextResponse.json(
+        { error: text || "Error en MailerLite" },
+        { status: mlRes.status }
+      );
+    }
+    const data = await mlRes.json();
+    return NextResponse.json({ ok: true, data }, { status: 200 });
+  } catch (e) {
     return NextResponse.json(
-      { ok: false, error: "Rate limit" },
-      { status: 429 }
+      { error: "Error interno del servidor" },
+      { status: 500 }
     );
   }
-
-  // …el resto de tu código para validar email y llamar a MailerLite…
 }

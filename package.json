@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "postbuild": "copy out\\index.html out\\404.html >NUL 2>&1 || cp out/index.html out/404.html"
+    "start": "next start",
+    "lint": "next lint"
   },
   "dependencies": {
     "next": "15.5.3",
