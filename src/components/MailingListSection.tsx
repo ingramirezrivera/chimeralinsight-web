@@ -17,7 +17,7 @@ export default function MailingListSection({
   blurbTop = "Join my mailing list to receive bonus content from my books, starting with",
   blurbBottom = "Vaccine: A Terrorism Thriller - all for free!",
   ctaText = "Get My Free Bonus Content",
-  subscribeUrl,
+  subscribeUrl = "/api/subscribe", // ✅ por defecto apunta a tu API interna
 }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
@@ -40,15 +40,24 @@ export default function MailingListSection({
     setStatus("loading");
 
     try {
-      if (subscribeUrl) {
-        await fetch(subscribeUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        });
-      } else {
-        await new Promise((r) => setTimeout(r, 800));
+      const res = await fetch(subscribeUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        // hp es un honeypot vacío para coincidir con tu route.ts
+        body: JSON.stringify({ email, hp: "" }),
+      });
+
+      if (!res.ok) {
+        let msg = "Something went wrong. Please try again.";
+        try {
+          const j = await res.json();
+          msg = j?.error || msg;
+        } catch {}
+        setStatus("error");
+        setErrorMsg(msg);
+        return;
       }
+
       setStatus("ok");
       setEmail("");
     } catch {
@@ -60,7 +69,7 @@ export default function MailingListSection({
   return (
     <section id="mailing-list" className="w-full bg-[#2f8185e8] font-sans ">
       <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-2 md:pt-8 pb-12">
-        {/* ✅ Grid: 1 columna en mobile, 2 en md+ */}
+        {/* Grid: 1 columna en mobile, 2 en md+ */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-0 md:gap-8 md:gap-12 items-start">
           {/* Imagen */}
           <div className="order-1 md:order-none flex justify-center md:justify-start">
@@ -93,7 +102,7 @@ export default function MailingListSection({
                   Thanks! Please check your inbox to confirm your subscription.
                 </p>
               ) : (
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4" noValidate>
                   <label
                     htmlFor="ml-email"
                     className="block text-white text-lg font-semibold"
@@ -110,6 +119,7 @@ export default function MailingListSection({
                     className="w-full rounded-md bg-white text-gray-900 placeholder:text-gray-400 px-4 py-3 outline-none ring-2 ring-transparent focus:ring-cyan-300"
                     aria-invalid={!!errorMsg}
                     aria-describedby={errorMsg ? "ml-email-error" : undefined}
+                    required
                   />
 
                   {errorMsg && (
@@ -120,7 +130,7 @@ export default function MailingListSection({
 
                   <button
                     type="submit"
-                    disabled={status === "loading"}
+                    disabled={status === "loading" || !isValid(email)}
                     className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {status === "loading" ? "Sending…" : ctaText}

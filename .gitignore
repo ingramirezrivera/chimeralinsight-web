@@ -63,3 +63,5 @@ dist/
 
 # misc
 .DS_Store
+
+deploy.tar.gz
