@@ -30,7 +30,8 @@
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "tailwind.config.js",
-    "src/app/api/notify"
+    "src/app/api/notify",
+    "next.config.js"
   ],
   "exclude": ["node_modules"]
 }
