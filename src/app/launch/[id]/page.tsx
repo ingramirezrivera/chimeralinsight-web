@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-// [CORRECCIÓN]: Sustituimos las importaciones problemáticas con placeholders simples
 // import Image from "next/image"; // Reemplazado por <img> en el JSX
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-// Asumimos que estos módulos existen en tu proyecto:
 import { books } from "@/data/books";
 import RegisterForLaunchForm from "./RegisterForLaunchForm.client";
 
-// [CORRECCIÓN]: Placeholder para resolver el error de alias de ruta
-const withBasePath = (path: string) => {
-  // En Next.js, esta función normalmente añade el basePath si existe.
-  // Aquí la dejamos simple para que compile.
-  return path;
-};
+// Placeholder para basePath
+const withBasePath = (path: string) => path;
 
 export const dynamic = "auto";
 export const dynamicParams = false;
@@ -27,6 +21,11 @@ interface BookData {
   availability?: "upcoming" | "available";
   releaseDate?: string; // ISO
 }
+
+// 👇 Tipo correcto para las props de esta página en Next 15
+type LaunchPageProps = {
+  params: Promise<{ id: string }>;
+};
 
 function findBook(id: string): BookData | undefined {
   return books.find((b) => b.id === id) as BookData | undefined;
@@ -48,12 +47,11 @@ export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
 }
 
+// 👇 Aquí usamos LaunchPageProps y hacemos await a params
 export async function generateMetadata({
   params,
-}: {
-  params: { id: string };
-}): Promise<Metadata> {
-  const { id } = await params; // Usamos params directamente si es un Server Component
+}: LaunchPageProps): Promise<Metadata> {
+  const { id } = await params;
   const book = findBook(id);
   if (!book) return { title: "Launch | Book not found" };
 
@@ -61,21 +59,16 @@ export async function generateMetadata({
     title: `Launch — ${book.title} | Chimeralinsight`,
     description:
       book.subtitle ?? book.description?.slice(0, 160) ?? "Book pre-launch",
-    // Canonical con basePath (meta)
     alternates: { canonical: withBasePath(`/launch/${book.id}/`) },
   };
 }
 
-export default async function LaunchPage({
-  params,
-}: {
-  params: { id: string };
-}) {
-  const { id } = params;
+// 👇 Lo mismo aquí: props tipadas y await params
+export default async function LaunchPage({ params }: LaunchPageProps) {
+  const { id } = await params;
   const book = findBook(id);
   if (!book) notFound();
 
-  // En export estático, mantén el basePath en el redirect
   if (book.availability !== "upcoming") {
     redirect(withBasePath(`/books/${id}/`));
   }
@@ -87,7 +80,6 @@ export default async function LaunchPage({
     <main className="font-sans">
       <header className="bg-white">
         <div className="container mx-auto px-6 py-6 flex items-center justify-between">
-          {/* INTERNAL: Link sin withBasePath */}
           <Link href="/" className="no-underline hover:no-underline">
             <span className="text-lg font-semibold hover:opacity-90">
               ← Back to Home
@@ -105,7 +97,6 @@ export default async function LaunchPage({
             {/* Cover */}
             <div className="md:col-span-5">
               <div className="relative aspect-[3/4] w-full max-w-[420px] mx-auto overflow-hidden rounded-2xl shadow">
-                {/* [CORRECCIÓN]: Uso de <img> estándar en lugar de Next/Image */}
                 <img
                   src={withBasePath(book.coverSrc)}
                   alt={`${book.title} cover`}
@@ -157,7 +148,6 @@ export default async function LaunchPage({
 
           {/* Navegación secundaria */}
           <div className="mt-10 flex justify-center gap-3">
-            {/* INTERNAL: Link sin withBasePath, con slash final */}
             <Link
               href={`/books/${book.id}/`}
               className="rounded-lg bg-gray-800 text-white px-5 py-3 font-semibold hover:opacity-90 no-underline"
