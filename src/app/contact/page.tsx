@@ -49,7 +49,7 @@ export default function ContactPage() {
       const body = encodeURIComponent(
         `Name: ${payload.name}\nEmail: ${payload.email}\n\n${payload.message}`
       );
-      window.location.href = `mailto:info@chimeralinsight.com?subject=${subject}&body=${body}`;
+      window.location.href = `mailto:robinrthrillers@chimeralinsight.com?subject=${subject}&body=${body}`;
       setState("success");
       setMsg("Opening your email client…");
     }
@@ -76,126 +76,12 @@ export default function ContactPage() {
       <section className="container mx-auto px-4 lg:px-10 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Card: Form */}
-          <div className="lg:col-span-7">
-            <div className="rounded-2xl bg-white shadow-xl border border-gray-100 p-6 sm:p-8">
-              <h2 className="text-2xl font-semibold text-[#494949]">
-                Send a message
-              </h2>
-              <p className="mt-2 text-gray-500">
-                Fields marked with <span className="text-red-500">*</span> are
-                required.
-              </p>
-
-              <form onSubmit={onSubmit} className="mt-6 space-y-5">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Name <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    id="name"
-                    name="name"
-                    type="text"
-                    required
-                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-[var(--brand-600,#0891b2)] focus:ring-2 focus:ring-[var(--brand-600,#0891b2)]/40"
-                    placeholder="Your name"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      required
-                      className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-[var(--brand-600,#0891b2)] focus:ring-2 focus:ring-[var(--brand-600,#0891b2)]/40"
-                      placeholder="you@example.com"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="subject"
-                      className="block text-sm font-medium text-gray-700"
-                    >
-                      Subject
-                    </label>
-                    <input
-                      id="subject"
-                      name="subject"
-                      type="text"
-                      className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-[var(--brand-600,#0891b2)] focus:ring-2 focus:ring-[var(--brand-600,#0891b2)]/40"
-                      placeholder="(optional)"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="message"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Message <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    required
-                    rows={6}
-                    className="mt-1 w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-gray-900 shadow-sm focus:border-[var(--brand-600,#0891b2)] focus:ring-2 focus:ring-[var(--brand-600,#0891b2)]/40"
-                    placeholder="How can we help?"
-                  />
-                </div>
-
-                {/* estado */}
-                {state !== "idle" && (
-                  <p
-                    className={[
-                      "text-sm",
-                      state === "error"
-                        ? "text-red-600"
-                        : "text-[var(--brand-600,#0891b2)]",
-                    ].join(" ")}
-                    role={state === "error" ? "alert" : undefined}
-                  >
-                    {msg}
-                  </p>
-                )}
-
-                <div className="pt-2">
-                  <button
-                    type="submit"
-                    disabled={state === "submitting"}
-                    className={[
-                      "w-full sm:w-auto inline-flex items-center justify-center rounded-lg",
-                      "bg-[var(--brand,#0f766e)] text-white hover:bg-[var(--brand-600,#0891b2)]",
-                      "px-6 py-3 text-base font-semibold",
-                      "transition-colors disabled:opacity-60 disabled:cursor-not-allowed",
-                    ].join(" ")}
-                  >
-                    {state === "submitting" ? "Sending…" : "Send message"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
 
           {/* Card: Info / Social */}
           <div className="lg:col-span-5">
             <div className="rounded-2xl bg-[var(--brand,#0f766e)] text-white shadow-xl p-6 sm:p-8 lg:sticky lg:top-[calc(var(--nav-h,80px)+16px)]">
               <h2 className="text-2xl font-semibold">Contact details</h2>
-              <p className="mt-2 text-white/90">
-                Prefer email? Reach us directly and we’ll reply shortly.
-              </p>
+              <p className="mt-2 text-white/90">Reach us directly to:</p>
 
               <div className="mt-6 space-y-4 text-white/95">
                 <p>
@@ -204,7 +90,7 @@ export default function ContactPage() {
                     href="mailto:info@chimeralinsight.com"
                     className="font-medium hover:underline text-white"
                   >
-                    info@chimeralinsight.com
+                    robinrthrillers@chimeralinsight.com
                   </a>
                 </p>
 

@@ -1,8 +1,6 @@
-// src/components/RegisterForLaunchForm.tsx
 "use client";
 
 import { useState } from "react";
-import { withBasePath } from "@/lib/paths"; // ✅ corregido
 
 export interface RegisterProps {
   bookId: string;
@@ -17,21 +15,48 @@ export default function RegisterForLaunchForm({
   const [status, setStatus] = useState<"idle" | "ok" | "error" | "loading">(
     "idle"
   );
+  const [errorMsg, setErrorMsg] = useState<string>("");
+
+  const isValid = (val: string) =>
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val.trim());
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setErrorMsg("");
+
+    if (!isValid(email)) {
+      setErrorMsg("Please enter a valid email address.");
+      return;
+    }
+
     setStatus("loading");
+
     try {
-      const res = await fetch(withBasePath("/api/notify"), {
+      const res = await fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, bookId }),
+        body: JSON.stringify({ email, bookId, hp: "" }),
       });
-      if (!res.ok) throw new Error("Request failed");
+
+      if (!res.ok) {
+        let msg = "Something went wrong. Please try again.";
+        try {
+          const j = await res.json();
+          msg = j?.error || j?.message || msg;
+        } catch {}
+
+        setStatus("error");
+        setErrorMsg(msg);
+        return;
+      }
+
       setStatus("ok");
       setEmail("");
-    } catch {
+      setErrorMsg("");
+    } catch (e) {
+      console.error("Fetch Error:", e);
       setStatus("error");
+      setErrorMsg("A network error occurred. Check your connection.");
     }
   }
 
@@ -51,12 +76,14 @@ export default function RegisterForLaunchForm({
           aria-label="Email"
         />
         <button
-          disabled={status === "loading"}
+          type="submit"
+          disabled={status === "loading" || !isValid(email)}
           className="rounded-md bg-gray-900 text-white px-4 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
         >
           {status === "loading" ? "Sending…" : "Notify Me"}
         </button>
       </div>
+
       {status === "ok" && (
         <p className="text-sm text-green-700">
           Thanks! We’ll notify you at launch.
@@ -64,7 +91,7 @@ export default function RegisterForLaunchForm({
       )}
       {status === "error" && (
         <p className="text-sm text-red-700">
-          Something went wrong. Please try again.
+          {errorMsg || "Something went wrong. Please try again."}
         </p>
       )}
     </form>

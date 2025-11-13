@@ -20,6 +20,31 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "Chimeralinsight",
   description: "Website for the Author Chimeralinsight",
+
+  themeColor: "#ffffff",
+  manifest: "/images/favicon/site.webmanifest",
+
+  icons: {
+    icon: [
+      { url: "/images/favicon/favicon.ico", sizes: "any" },
+      {
+        url: "/images/favicon/favicon-32x32.png",
+        sizes: "32x32",
+        type: "image/png",
+      },
+      {
+        url: "/images/favicon/favicon-16x16.png",
+        sizes: "16x16",
+        type: "image/png",
+      },
+      {
+        url: "/images/favicon/favicon-96x96.png",
+        sizes: "96x96",
+        type: "image/png",
+      },
+    ],
+    apple: "/images/favicon/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
