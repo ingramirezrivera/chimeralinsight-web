@@ -1,11 +1,11 @@
+// app/launch/[id]/page.tsx
 import type { Metadata } from "next";
-// import Image from "next/image"; // Reemplazado por <img> en el JSX
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { books } from "@/data/books";
 import RegisterForLaunchForm from "./RegisterForLaunchForm.client";
 
-// Placeholder para basePath
+// Placeholder para basePath (si luego usas basePath real, lo ajustamos)
 const withBasePath = (path: string) => path;
 
 export const dynamic = "auto";
@@ -22,7 +22,7 @@ interface BookData {
   releaseDate?: string; // ISO
 }
 
-// 👇 Tipo correcto para las props de esta página en Next 15
+// Next 15: params es una Promise
 type LaunchPageProps = {
   params: Promise<{ id: string }>;
 };
@@ -47,7 +47,6 @@ export function generateStaticParams() {
   return books.map((b) => ({ id: b.id }));
 }
 
-// 👇 Aquí usamos LaunchPageProps y hacemos await a params
 export async function generateMetadata({
   params,
 }: LaunchPageProps): Promise<Metadata> {
@@ -63,7 +62,6 @@ export async function generateMetadata({
   };
 }
 
-// 👇 Lo mismo aquí: props tipadas y await params
 export default async function LaunchPage({ params }: LaunchPageProps) {
   const { id } = await params;
   const book = findBook(id);
@@ -142,6 +140,7 @@ export default async function LaunchPage({ params }: LaunchPageProps) {
                 )}
               </div>
 
+              {/* Aquí metemos el formulario embebido */}
               <RegisterForLaunchForm bookId={book.id} bookTitle={book.title} />
             </div>
           </div>

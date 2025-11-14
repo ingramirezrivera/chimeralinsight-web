@@ -1,11 +1,8 @@
 "use client";
 
 import { useState } from "react";
-// Importaciones de Next.js reemplazadas para evitar errores de resolución:
-// import Image from "next/image";
-// import { withBasePath } from "@/lib/paths";
 
-// Placeholder para resolver el error de alias de ruta. Asume que la ruta es correcta.
+// Resolver rutas
 const withBasePath = (path: string) => path;
 
 interface Props {
@@ -13,7 +10,7 @@ interface Props {
   blurbTop?: string;
   blurbBottom?: string;
   ctaText?: string;
-  subscribeUrl?: string;
+  subscribeUrl?: string; // 👈 la agregamos de nuevo
 }
 
 export default function MailingListSection({
@@ -21,7 +18,7 @@ export default function MailingListSection({
   blurbTop = "Join my mailing list to receive bonus content from my books, starting with",
   blurbBottom = "Vaccine: A Terrorism Thriller - all for free!",
   ctaText = "Get My Free Bonus Content",
-  subscribeUrl = "/api/subscribe", // ✅ por defecto apunta a tu API interna
+  subscribeUrl = "/api/subscribe", // 👈 valor por defecto
 }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
@@ -44,20 +41,21 @@ export default function MailingListSection({
     setStatus("loading");
 
     try {
-      // NOTE: Using withBasePath is often unnecessary for internal relative API routes like /api/subscribe
       const res = await fetch(subscribeUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // hp is an empty honeypot to match the check in route.ts
-        body: JSON.stringify({ email, hp: "" }),
+        body: JSON.stringify({
+          email,
+          bookId: "mailing-list",
+          hp: "",
+        }),
       });
 
       if (!res.ok) {
         let msg = "Something went wrong. Please try again.";
         try {
           const j = await res.json();
-          // The route.ts returns j.error for an error message
-          msg = j?.error || msg;
+          msg = j?.error || j?.message || msg;
         } catch {}
         setStatus("error");
         setErrorMsg(msg);
@@ -75,26 +73,23 @@ export default function MailingListSection({
   return (
     <section id="mailing-list" className="w-full bg-[#2f8185e8] font-sans ">
       <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8 py-2 md:pt-8 pb-12">
-        {/* Grid: 1 column on mobile, 2 on md+ */}
         <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-0 md:gap-8 md:gap-12 items-start">
-          {/* Image (Replaced Next.js Image component with standard <img>) */}
+          {/* Imagen */}
           <div className="order-1 md:order-none flex justify-center md:justify-start">
-            <img // <img> tag used instead of Next.js <Image>
+            <img
               src={withBasePath("/images/paperplane.png")}
               alt="Paper plane doodle"
               width={240}
               height={160}
               className="w-40 md:w-72 h-auto pointer-events-none select-none opacity-95"
-              // Removed priority and sizes attributes as they are Next.js specific
             />
           </div>
 
-          {/* Text + Card */}
+          {/* Texto + Formulario */}
           <div className="order-2 md:order-none">
             <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide">
               {title}
             </h2>
-
             <p className="mt-4 text-white/95 text-lg md:text-xl leading-relaxed">
               {blurbTop}
               <br />
