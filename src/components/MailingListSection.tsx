@@ -10,6 +10,7 @@ interface Props {
   blurbTop?: string;
   blurbBottom?: string;
   ctaText?: string;
+  subscribeUrl?: string; // 👈 la agregamos de nuevo
 }
 
 export default function MailingListSection({
@@ -17,6 +18,7 @@ export default function MailingListSection({
   blurbTop = "Join my mailing list to receive bonus content from my books, starting with",
   blurbBottom = "Vaccine: A Terrorism Thriller - all for free!",
   ctaText = "Get My Free Bonus Content",
+  subscribeUrl = "/api/subscribe", // 👈 valor por defecto
 }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
@@ -39,7 +41,7 @@ export default function MailingListSection({
     setStatus("loading");
 
     try {
-      const res = await fetch("/api/subscribe", {
+      const res = await fetch(subscribeUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
