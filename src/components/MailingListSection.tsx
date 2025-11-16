@@ -1,3 +1,4 @@
+//mailing-list-section.tsx
 "use client";
 
 import { useState } from "react";
