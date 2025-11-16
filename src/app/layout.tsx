@@ -11,17 +11,21 @@ const robotoCondensed = Roboto_Condensed({
   display: "swap",
 });
 
+// ===================================
+// ✅ EXPORTACIÓN VIEWPORT CORREGIDA
+// Se incluye 'themeColor' aquí
+// ===================================
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  themeColor: "#ffffff", // MOVIDO AQUÍ
 };
 
 export const metadata: Metadata = {
   title: "Chimeralinsight",
   description: "Website for the Author Chimeralinsight",
 
-  themeColor: "#ffffff",
   manifest: "/images/favicon/site.webmanifest",
 
   icons: {
