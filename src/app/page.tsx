@@ -1,4 +1,4 @@
-// src/app/page.tsx (o donde está tu Home)
+// src/app/page.tsx
 import Hero from "../components/Hero";
 import BooksCarousel from "../components/BooksCarousel";
 import AboutAuthor from "@/components/AboutAuthor";
@@ -31,7 +31,7 @@ export default function Home() {
       </section>
 
       <section id="mailing-list">
-        <MailingListSection subscribeUrl="" />
+        <MailingListSection />
       </section>
     </main>
   );
