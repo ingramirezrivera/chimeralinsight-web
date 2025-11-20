@@ -19,7 +19,7 @@ export default function MailingListSection({
   blurbTop = "Join my mailing list to receive bonus content from my books, starting with",
   blurbBottom = "Vaccine: A Terrorism Thriller - all for free!",
   ctaText = "Get My Free Bonus Content",
-  subscribeUrl = "/api/subscribe", // 👈 valor por defecto
+  subscribeUrl = "/api/subscribe",
 }: Props) {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
