@@ -1,7 +1,7 @@
-//mailing-list-section.tsx
 "use client";
 
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha"; // 👈 1. Importamos la librería
 
 // Resolver rutas
 const withBasePath = (path: string) => path;
@@ -11,7 +11,7 @@ interface Props {
   blurbTop?: string;
   blurbBottom?: string;
   ctaText?: string;
-  subscribeUrl?: string; // 👈 la agregamos de nuevo
+  subscribeUrl?: string;
 }
 
 export default function MailingListSection({
@@ -22,6 +22,9 @@ export default function MailingListSection({
   subscribeUrl = "/api/subscribe",
 }: Props) {
   const [email, setEmail] = useState("");
+  // 👈 2. Estado para guardar el token del Captcha
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
   const [status, setStatus] = useState<"idle" | "loading" | "ok" | "error">(
     "idle"
   );
@@ -39,6 +42,12 @@ export default function MailingListSection({
       return;
     }
 
+    // 👈 3. Validación: Si no marcaron la casilla, detenemos todo aquí.
+    if (!captchaToken) {
+      setErrorMsg("Please confirm that you are not a robot.");
+      return;
+    }
+
     setStatus("loading");
 
     try {
@@ -49,6 +58,7 @@ export default function MailingListSection({
           email,
           bookId: "mailing-list",
           hp: "",
+          recaptchaToken: captchaToken, // 👈 4. Enviamos el token al backend
         }),
       });
 
@@ -65,6 +75,7 @@ export default function MailingListSection({
 
       setStatus("ok");
       setEmail("");
+      setCaptchaToken(null); // Limpiamos el token al finalizar
     } catch {
       setStatus("error");
       setErrorMsg("Something went wrong. Please try again.");
@@ -123,6 +134,15 @@ export default function MailingListSection({
                     required
                   />
 
+                  {/* 👈 5. Aquí insertamos el componente visual del Captcha */}
+                  <div className="flex justify-center py-2">
+                    <ReCAPTCHA
+                      sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+                      onChange={(token) => setCaptchaToken(token)}
+                      theme="dark" // Opcional: para que combine mejor con tu fondo oscuro
+                    />
+                  </div>
+
                   {errorMsg && (
                     <p id="ml-email-error" className="text-rose-200 text-sm">
                       {errorMsg}
@@ -131,7 +151,10 @@ export default function MailingListSection({
 
                   <button
                     type="submit"
-                    disabled={status === "loading" || !isValid(email)}
+                    // 👈 6. Deshabilitamos el botón si no hay captcha
+                    disabled={
+                      status === "loading" || !isValid(email) || !captchaToken
+                    }
                     className="w-full rounded-lg bg-cyan-400 hover:bg-cyan-300 text-teal-900 font-semibold px-6 py-3 text-lg transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {status === "loading" ? "Sending…" : ctaText}
