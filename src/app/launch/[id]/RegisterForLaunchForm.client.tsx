@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha"; // 👈 1. Importar librería
 
 export interface RegisterProps {
   bookId: string;
@@ -12,6 +13,9 @@ export default function RegisterForLaunchForm({
   bookTitle,
 }: RegisterProps) {
   const [email, setEmail] = useState<string>("");
+  // 👈 2. Estado para el token
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+
   const [status, setStatus] = useState<"idle" | "ok" | "error" | "loading">(
     "idle"
   );
@@ -29,13 +33,25 @@ export default function RegisterForLaunchForm({
       return;
     }
 
+    // 👈 3. Validar que marcaron el captcha antes de enviar
+    if (!captchaToken) {
+      setErrorMsg("Please confirm that you are not a robot.");
+      return;
+    }
+
     setStatus("loading");
 
     try {
+      // Nota: Asegúrate de que tu ruta /api/notify también espere el token
       const res = await fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, bookId, hp: "" }),
+        body: JSON.stringify({
+          email,
+          bookId,
+          hp: "",
+          recaptchaToken: captchaToken, // 👈 4. Enviamos el token
+        }),
       });
 
       if (!res.ok) {
@@ -52,6 +68,7 @@ export default function RegisterForLaunchForm({
 
       setStatus("ok");
       setEmail("");
+      setCaptchaToken(null); // Limpiamos el token
       setErrorMsg("");
     } catch (e) {
       console.error("Fetch Error:", e);
@@ -65,6 +82,8 @@ export default function RegisterForLaunchForm({
       <label className="block text-sm font-medium text-neutral-700">
         Get notified about <span className="font-semibold">{bookTitle}</span>
       </label>
+
+      {/* Grupo Input + Botón */}
       <div className="flex gap-2">
         <input
           type="email"
@@ -77,11 +96,20 @@ export default function RegisterForLaunchForm({
         />
         <button
           type="submit"
-          disabled={status === "loading" || !isValid(email)}
-          className="rounded-md bg-gray-900 text-white px-4 py-2 font-semibold hover:opacity-90 disabled:opacity-60"
+          // 👈 5. Botón deshabilitado si no hay captcha
+          disabled={status === "loading" || !isValid(email) || !captchaToken}
+          className="rounded-md bg-gray-900 text-white px-4 py-2 font-semibold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {status === "loading" ? "Sending…" : "Notify Me"}
         </button>
+      </div>
+
+      {/* 👈 6. El Captcha visual (debajo del input para que se vea bien) */}
+      <div className="mt-2">
+        <ReCAPTCHA
+          sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || ""}
+          onChange={(token) => setCaptchaToken(token)}
+        />
       </div>
 
       {status === "ok" && (
