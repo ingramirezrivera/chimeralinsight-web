@@ -4,35 +4,28 @@ import { NextResponse } from "next/server";
 // Lee el Group ID y API Key desde las env vars
 const GROUP_ID = process.env.MAILERLITE_GROUP_ID_WHIPTHEDOGS;
 const API_KEY = process.env.MAILERLITE_API_KEY;
+const RECAPTCHA_SECRET = process.env.RECAPTCHA_SECRET_KEY; // 👈 Leemos la clave secreta
 
-// 👉 Endpoint correcto para crear/actualizar suscriptores
+// Endpoint correcto para crear/actualizar suscriptores
 const API_URL = "https://connect.mailerlite.com/api/subscribers";
 
 /* ========= RATE LIMITING EN MEMORIA ========= */
-
-// Límite por EMAIL: 3 intentos cada 60 segundos
+// (Mantenemos tu lógica de rate limiting intacta)
 const EMAIL_WINDOW_MS = 60_000;
 const EMAIL_MAX = 3;
-
-// Límite por IP: 10 intentos cada 5 minutos
 const IP_WINDOW_MS = 5 * 60_000;
 const IP_MAX = 10;
 
-// Mapas en memoria (viven mientras el proceso de Node esté corriendo)
 const emailAttempts = new Map<string, number[]>();
 const ipAttempts = new Map<string, number[]>();
 
 function getClientIp(req: Request): string {
-  // Intentamos leer IP real desde los headers típicos detrás de proxy/nginx
   const xfwd = req.headers.get("x-forwarded-for");
   if (xfwd) {
-    // Puede venir "ip1, ip2, ip3" → nos quedamos con la primera
     return xfwd.split(",")[0].trim();
   }
   const xreal = req.headers.get("x-real-ip");
   if (xreal) return xreal.trim();
-  // Fallback: no tenemos acceso directo al socket en este contexto,
-  // así que usamos un identificador genérico.
   return "unknown";
 }
 
@@ -44,12 +37,9 @@ function isRateLimited(
   now: number
 ): boolean {
   const timestamps = map.get(key) || [];
-
-  // Filtrar para quedarnos solo con timestamps dentro de la ventana
   const recent = timestamps.filter((t) => now - t < windowMs);
   recent.push(now);
   map.set(key, recent);
-
   return recent.length > max;
 }
 
@@ -60,13 +50,48 @@ export async function POST(req: Request) {
   const ip = getClientIp(req);
 
   try {
-    // Recibimos email, bookId y hp (honeypot)
-    const { email, bookId, hp } = await req.json();
+    // 👈 1. Ahora extraemos también el 'recaptchaToken' del body
+    const { email, bookId, hp, recaptchaToken } = await req.json();
 
     // Honeypot: si hp viene relleno, probablemente es bot → salimos silenciosamente
     if (hp) {
       return NextResponse.json({ ok: true }, { status: 200 });
     }
+
+    // ============================================================
+    // 👈 2. VERIFICACIÓN DE RECAPTCHA (Seguridad Primero)
+    // ============================================================
+    if (!recaptchaToken) {
+      return NextResponse.json(
+        { error: "Captcha is missing. Please confirm you are not a robot." },
+        { status: 400 }
+      );
+    }
+
+    if (!RECAPTCHA_SECRET) {
+      console.error("ERROR: RECAPTCHA_SECRET_KEY is missing in .env");
+      return NextResponse.json(
+        { error: "Server configuration error" },
+        { status: 500 }
+      );
+    }
+
+    // Le preguntamos a Google si el token es válido
+    const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${RECAPTCHA_SECRET}&response=${recaptchaToken}`;
+    const verifyRes = await fetch(verifyUrl, { method: "POST" });
+    const verifyData = await verifyRes.json();
+
+    // Si Google dice "false", detenemos el proceso aquí mismo
+    if (!verifyData.success) {
+      console.warn(`Captcha Failed for IP ${ip}:`, verifyData["error-codes"]);
+      return NextResponse.json(
+        { error: "Invalid Captcha. Please try again." },
+        { status: 400 }
+      );
+    }
+    // ============================================================
+    // FIN VERIFICACIÓN CAPTCHA
+    // ============================================================
 
     // RATE LIMIT POR EMAIL
     if (
@@ -118,7 +143,7 @@ export async function POST(req: Request) {
       body: JSON.stringify({
         email,
         status: "active",
-        groups: [GROUP_ID], // 👈 aquí asignas al grupo Launch
+        groups: [GROUP_ID],
         fields: {
           book_id: bookId,
           source: "Whip the Dogs Launch",
