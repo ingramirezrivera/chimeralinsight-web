@@ -233,7 +233,7 @@ export default async function BlogPostPage({
                       Buy this book from the retailer that works best for you.
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      {relatedBook.retailers.map((retailer) => (
+                      {relatedBook.retailers.map((retailer: (typeof relatedBook.retailers)[number]) => (
                         <a
                           key={retailer.id}
                           href={retailer.url}

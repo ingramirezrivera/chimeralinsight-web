@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
   );
 
-  const blogRoutes = posts.map((post) => ({
+  const blogRoutes = posts.map((post: (typeof posts)[number]) => ({
     url: `${siteUrl}/blog/${post.slug}`,
     lastModified: post.updatedAt,
   }));

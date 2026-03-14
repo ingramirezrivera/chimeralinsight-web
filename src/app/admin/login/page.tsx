@@ -73,7 +73,7 @@ export default async function AdminLoginPage({
               "Drafts and publishing states",
               "Structured SEO metadata per article",
               "Secure local uploads on the VPS",
-            ].map((item) => (
+            ].map((item: string) => (
               <div
                 key={item}
                 className="rounded-[24px] border border-black/5 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(252,249,244,0.82))] p-5 shadow-[0_18px_50px_-38px_rgba(15,23,42,0.4)]"
