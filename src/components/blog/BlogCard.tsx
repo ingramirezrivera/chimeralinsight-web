@@ -1,13 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { Post, User } from "@prisma/client";
 import type { BookData } from "@/data/books";
 import { siteConfig } from "@/lib/site";
 import { withBasePath } from "@/lib/paths";
 import { formatDate } from "@/lib/utils";
 
-type BlogListPost = Post & {
-  author: User | null;
+type BlogListPost = {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  featuredImage: string | null;
+  featuredImageAlt: string | null;
+  publishedAt: Date | null;
+  createdAt: Date;
+  author: {
+    email: string;
+  } | null;
 };
 
 export default function BlogCard({
