@@ -1,6 +1,5 @@
 "use server";
 
-import { PostStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createEmptyContent } from "@/lib/blog/content";
@@ -8,12 +7,14 @@ import { requireRole } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
 import { blogContentSchema, postInputSchema } from "@/lib/validations/blog";
 
+type PostStatusValue = "DRAFT" | "PUBLISHED";
+
 function normalizeOptional(value: string) {
   return value.trim() || null;
 }
 
-function getPublishedAt(status: PostStatus, rawPublishedAt: string) {
-  if (status !== PostStatus.PUBLISHED) return null;
+function getPublishedAt(status: PostStatusValue, rawPublishedAt: string) {
+  if (status !== "PUBLISHED") return null;
   if (!rawPublishedAt) return new Date();
   return new Date(rawPublishedAt);
 }
@@ -26,7 +27,7 @@ export async function createPostAction() {
       title: "Untitled draft",
       slug: `draft-${Date.now()}`,
       content: createEmptyContent(),
-      status: PostStatus.DRAFT,
+      status: "DRAFT",
       authorId: session.userId,
     },
   });
@@ -65,7 +66,7 @@ export async function savePostAction(formData: FormData) {
     ...JSON.parse(parsed.content),
     featuredImageSize,
   });
-  const status = parsed.status === "PUBLISHED" ? PostStatus.PUBLISHED : PostStatus.DRAFT;
+  const status: PostStatusValue = parsed.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
 
   const payload = {
     title: parsed.title,
@@ -123,13 +124,13 @@ export async function togglePostStatusAction(formData: FormData) {
   const id = String(formData.get("id") || "");
   const nextStatus = String(formData.get("nextStatus") || "DRAFT");
 
-  const status = nextStatus === "PUBLISHED" ? PostStatus.PUBLISHED : PostStatus.DRAFT;
+  const status: PostStatusValue = nextStatus === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
 
   await prisma.post.update({
     where: { id },
     data: {
       status,
-      publishedAt: status === PostStatus.PUBLISHED ? new Date() : null,
+      publishedAt: status === "PUBLISHED" ? new Date() : null,
     },
   });
 

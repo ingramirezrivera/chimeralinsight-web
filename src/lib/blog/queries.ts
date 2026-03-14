@@ -1,4 +1,3 @@
-import { PostStatus } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { isMissingTableError } from "@/lib/db-errors";
 
@@ -6,7 +5,7 @@ export async function getPublishedPosts() {
   try {
     return await prisma.post.findMany({
       where: {
-        status: PostStatus.PUBLISHED,
+        status: "PUBLISHED",
         publishedAt: { lte: new Date() },
       },
       include: {
@@ -30,7 +29,7 @@ export async function getPublishedPostBySlug(slug: string) {
     return await prisma.post.findFirst({
       where: {
         slug,
-        status: PostStatus.PUBLISHED,
+        status: "PUBLISHED",
         publishedAt: { lte: new Date() },
       },
       include: {
