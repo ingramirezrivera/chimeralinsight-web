@@ -34,7 +34,7 @@ export default async function BlogIndexPage({
   const selectedBookId = params?.book || "";
   const selectedBook = getBookById(selectedBookId);
 
-  const postsWithBooks = posts.map((post) => {
+  const postsWithBooks = posts.map((post: (typeof posts)[number]) => {
     const relatedBookId = ((post.content as BlogContent | null)?.relatedBookId || "").trim();
     return {
       post,
