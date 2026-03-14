@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Roboto_Condensed } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import SiteChrome from "@/components/SiteChrome";
+import { getSiteUrl, siteConfig } from "@/lib/site";
 
 const robotoCondensed = Roboto_Condensed({
   subsets: ["latin"],
@@ -11,23 +11,21 @@ const robotoCondensed = Roboto_Condensed({
   display: "swap",
 });
 
-// ===================================
-// ✅ EXPORTACIÓN VIEWPORT CORREGIDA
-// Se incluye 'themeColor' aquí
-// ===================================
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#ffffff", // MOVIDO AQUÍ
+  themeColor: "#ffffff",
 };
 
 export const metadata: Metadata = {
-  title: "Chimeralinsight",
-  description: "Website for the Author Chimeralinsight",
-
+  metadataBase: new URL(getSiteUrl()),
+  title: {
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
+  },
+  description: siteConfig.description,
   manifest: "/images/favicon/site.webmanifest",
-
   icons: {
     icon: [
       { url: "/images/favicon/favicon.ico", sizes: "any" },
@@ -59,9 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={robotoCondensed.variable}>
       <body>
-        <Navbar />
-        {children}
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
       </body>
     </html>
   );

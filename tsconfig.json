@@ -39,7 +39,7 @@
     ".next/types/**/*.ts",
     "tailwind.config.js",
     "src/app/api/notify",
-    "next.config.js",
+    "next.config.mjs",
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [

@@ -11,6 +11,7 @@ const primaryNav: NavItem[] = [
   { label: "Home", href: "/" },
   { label: "About", href: "/#about" },
   { label: "Books", href: "/#books" },
+  { label: "Blog", href: "/blog" },
   { label: "Press Kit", href: "/presskit" },
   { label: "Contact", href: "/contact" },
   { label: "Mailing List", href: "/#mailing-list" },

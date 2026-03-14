@@ -168,6 +168,14 @@ export default async function BookPage({
                 )}
 
                 <Link
+                  href={`/blog?book=${book.id}`}
+                  className="rounded-lg bg-[var(--brand)] w-48 text-center hover:bg-[#276d71] text-white
+                             font-semibold px-6 py-3 text-lg transition-colors no-underline"
+                >
+                  Book Articles
+                </Link>
+
+                <Link
                   href="/#books"
                   className="rounded-lg bg-gray-700/70 w-48 text-center hover:bg-gray-600 text-white
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
