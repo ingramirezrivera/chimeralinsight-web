@@ -37,7 +37,7 @@ export default async function AdminPostsPage() {
           {posts.length === 0 ? (
             <p className="text-slate-600">No posts yet. Create your first article.</p>
           ) : (
-            posts.map((post) => (
+            posts.map((post: (typeof posts)[number]) => (
               <article
                 key={post.id}
                 className="rounded-[24px] border border-[rgba(47,129,133,0.1)] bg-white/82 p-5"

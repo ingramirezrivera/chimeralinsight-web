@@ -4,7 +4,7 @@ import { useActionState } from "react";
 import { loginAction } from "@/app/admin/actions";
 
 export default function LoginForm({ redirectTo }: { redirectTo: string }) {
-  const [_state, formAction, pending] = useActionState(
+  const [, formAction, pending] = useActionState(
     async (_initialState: null, formData: FormData) => {
       await loginAction(formData);
       return null;

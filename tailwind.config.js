@@ -1,5 +1,5 @@
 // tailwind.config.ts (Tailwind v4, ESM, sin `content`)
-export default {
+const config = {
   theme: {
     extend: {
       colors: {
@@ -35,3 +35,5 @@ export default {
     },
   },
 };
+
+export default config;
