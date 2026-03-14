@@ -43,8 +43,10 @@ export default async function BlogIndexPage({
     };
   });
 
+  type PostWithBook = (typeof postsWithBooks)[number];
+
   const filteredPosts = selectedBookId
-    ? postsWithBooks.filter((item) => item.relatedBookId === selectedBookId)
+    ? postsWithBooks.filter((item: PostWithBook) => item.relatedBookId === selectedBookId)
     : postsWithBooks;
 
   return (
@@ -95,9 +97,9 @@ export default async function BlogIndexPage({
           </div>
 
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {books.map((book) => {
+            {books.map((book: (typeof books)[number]) => {
               const relatedCount = postsWithBooks.filter(
-                (item) => item.relatedBookId === book.id
+                (item: PostWithBook) => item.relatedBookId === book.id
               ).length;
 
               return (
@@ -143,7 +145,7 @@ export default async function BlogIndexPage({
           </div>
         ) : (
           <div className="grid gap-8 lg:grid-cols-2">
-            {filteredPosts.map(({ post, relatedBook }) => (
+            {filteredPosts.map(({ post, relatedBook }: PostWithBook) => (
               <BlogCard key={post.id} post={post} relatedBook={relatedBook} />
             ))}
           </div>
