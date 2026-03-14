@@ -1,3 +1,4 @@
+import type { Post } from "@prisma/client";
 import AdminShell from "@/components/admin/AdminShell";
 import LogoutButton from "@/app/admin/LogoutButton";
 import { requireSession } from "@/lib/auth/session";
@@ -46,7 +47,7 @@ export default async function AdminDashboardPage() {
           {recentPosts.length === 0 ? (
             <p className="text-slate-600">No posts yet. Start your first draft from the posts area.</p>
           ) : (
-            recentPosts.map((post) => (
+            recentPosts.map((post: Post) => (
               <div
                 key={post.id}
                 className="rounded-2xl border border-[rgba(47,129,133,0.1)] bg-white/82 px-4 py-4"
