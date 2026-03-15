@@ -1,5 +1,14 @@
-import { prisma } from "@/lib/db";
+import { describeDatabaseTarget, prisma } from "@/lib/db";
 import { isMissingTableError } from "@/lib/db-errors";
+
+function logMissingBlogTable(operation: string, error: unknown) {
+  const target = describeDatabaseTarget();
+
+  console.error(
+    `[blog] Missing database table while running ${operation}. DATABASE_URL=${target.databaseUrl} SQLITE_PATH=${target.sqliteFilePath}`,
+    error
+  );
+}
 
 export async function getPublishedPosts() {
   try {
@@ -17,6 +26,7 @@ export async function getPublishedPosts() {
     });
   } catch (error) {
     if (isMissingTableError(error)) {
+      logMissingBlogTable("getPublishedPosts", error);
       return [];
     }
 
@@ -38,6 +48,7 @@ export async function getPublishedPostBySlug(slug: string) {
     });
   } catch (error) {
     if (isMissingTableError(error)) {
+      logMissingBlogTable("getPublishedPostBySlug", error);
       return null;
     }
 
@@ -57,6 +68,7 @@ export async function getAllPostsForAdmin() {
     });
   } catch (error) {
     if (isMissingTableError(error)) {
+      logMissingBlogTable("getAllPostsForAdmin", error);
       return [];
     }
 
@@ -74,6 +86,7 @@ export async function getPostById(id: string) {
     });
   } catch (error) {
     if (isMissingTableError(error)) {
+      logMissingBlogTable("getPostById", error);
       return null;
     }
 

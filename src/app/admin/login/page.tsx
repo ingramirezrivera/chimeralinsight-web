@@ -6,6 +6,7 @@ import { getSession } from "@/lib/auth/session";
 const errorMessages: Record<string, string> = {
   invalid: "Invalid email or password.",
   "rate-limit": "Too many attempts. Please wait before trying again.",
+  config: "Admin authentication is not configured on the server yet.",
 };
 
 export default async function AdminLoginPage({
