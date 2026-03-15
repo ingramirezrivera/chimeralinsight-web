@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum UserRole {
+  ADMIN
+  EDITOR
+}
+
+enum PostStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  role         UserRole
+  posts        Post[]
+  media        Media[]   @relation("MediaUploadedBy")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Post {
+  id               String      @id @default(cuid())
+  title            String
+  slug             String      @unique
+  excerpt          String?
+  content          Json
+  featuredImage    String?
+  featuredImageAlt String?
+  seoTitle         String?
+  seoDescription   String?
+  status           PostStatus  @default(DRAFT)
+  publishedAt      DateTime?
+  author           User?       @relation(fields: [authorId], references: [id])
+  authorId         String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Media {
+  id           String    @id @default(cuid())
+  filename     String
+  path         String
+  mimeType     String
+  size         Int
+  alt          String?
+  uploadedBy   User?     @relation("MediaUploadedBy", fields: [uploadedById], references: [id])
+  uploadedById String?
+  createdAt    DateTime  @default(now())
+}

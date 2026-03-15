@@ -28,7 +28,7 @@ type LaunchPageProps = {
 };
 
 function findBook(id: string): BookData | undefined {
-  return books.find((b) => b.id === id) as BookData | undefined;
+  return books.find((b: BookData) => b.id === id) as BookData | undefined;
 }
 
 function formatRelease(dateISO?: string): string {
@@ -44,7 +44,7 @@ function formatRelease(dateISO?: string): string {
 }
 
 export function generateStaticParams() {
-  return books.map((b) => ({ id: b.id }));
+  return books.map((b: BookData) => ({ id: b.id }));
 }
 
 export async function generateMetadata({

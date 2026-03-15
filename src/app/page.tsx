@@ -4,7 +4,6 @@ import BooksCarousel from "../components/BooksCarousel";
 import AboutAuthor from "@/components/AboutAuthor";
 import BooksSection from "@/components/BooksSection";
 import MailingListSection from "@/components/MailingListSection";
-import { withBasePath } from "@/lib/paths";
 
 export default function Home() {
   return (

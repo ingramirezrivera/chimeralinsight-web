@@ -26,7 +26,7 @@ export const dynamic = "force-static";
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return books.map((b) => ({ id: b.id }));
+  return books.map((b: BookData) => ({ id: b.id }));
 }
 
 // En Next 15, params llega como Promise
@@ -36,7 +36,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const book = books.find((b) => b.id === id) as BookData | undefined;
+  const book = books.find((b: BookData) => b.id === id) as BookData | undefined;
   if (!book) return { title: "Book not found" };
 
   const desc =
@@ -72,7 +72,7 @@ export default async function BookPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const book = books.find((b) => b.id === id) as BookData | undefined;
+  const book = books.find((b: BookData) => b.id === id) as BookData | undefined;
   if (!book) notFound();
 
   const content: string = book.about ?? book.description ?? "";
@@ -166,6 +166,14 @@ export default async function BookPage({
                     Buy on Amazon
                   </BuyRetailerModalButton>
                 )}
+
+                <Link
+                  href={`/blog?book=${book.id}`}
+                  className="rounded-lg bg-[var(--brand)] w-48 text-center hover:bg-[#276d71] text-white
+                             font-semibold px-6 py-3 text-lg transition-colors no-underline"
+                >
+                  Book Articles
+                </Link>
 
                 <Link
                   href="/#books"

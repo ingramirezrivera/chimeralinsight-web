@@ -139,3 +139,8 @@ Andross detests the drug that will keep him sane while his body craves the needl
 Through espionage and military twists, Andross becomes a pawn in a game of military bluster. He is the secret key in a psychological battle of who will use their nuclear weapons first. Will it be the United States of America? Or will it be a failing state, unable to cling to power in any other way?`,
   },
 ];
+
+export function getBookById(bookId: string | null | undefined) {
+  if (!bookId) return null;
+  return books.find((book) => book.id === bookId) ?? null;
+}
