@@ -14,8 +14,14 @@ export type SessionUser = {
 const SESSION_COOKIE = "ci_admin_session";
 const ONE_WEEK_SECONDS = 60 * 60 * 24 * 7;
 
+function getAuthSecretValue() {
+  const secret = process.env.AUTH_SECRET?.trim();
+
+  return secret || null;
+}
+
 function getAuthSecret() {
-  const secret = process.env.AUTH_SECRET;
+  const secret = getAuthSecretValue();
 
   if (!secret) {
     throw new Error("AUTH_SECRET is required");
@@ -28,10 +34,14 @@ function encodePayload(payload: SessionUser) {
   return Buffer.from(JSON.stringify(payload)).toString("base64url");
 }
 
-function signPayload(encodedPayload: string) {
-  return createHmac("sha256", getAuthSecret())
+function signPayload(encodedPayload: string, secret: string = getAuthSecret()) {
+  return createHmac("sha256", secret)
     .update(encodedPayload)
     .digest("base64url");
+}
+
+export function isAuthConfigured() {
+  return Boolean(getAuthSecretValue());
 }
 
 export function createSessionToken(payload: Omit<SessionUser, "exp">) {
@@ -49,10 +59,13 @@ export function createSessionToken(payload: Omit<SessionUser, "exp">) {
 export function parseSessionToken(token: string | undefined) {
   if (!token) return null;
 
+  const secret = getAuthSecretValue();
+  if (!secret) return null;
+
   const [encodedPayload, signature] = token.split(".");
   if (!encodedPayload || !signature) return null;
 
-  const expectedSignature = signPayload(encodedPayload);
+  const expectedSignature = signPayload(encodedPayload, secret);
   const signatureBuffer = Buffer.from(signature);
   const expectedBuffer = Buffer.from(expectedSignature);
 

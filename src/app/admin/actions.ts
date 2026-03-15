@@ -4,7 +4,11 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { assertLoginRateLimit } from "@/lib/auth/login-rate-limit";
 import { verifyPassword } from "@/lib/auth/password";
-import { clearSessionCookie, setSessionCookie } from "@/lib/auth/session";
+import {
+  clearSessionCookie,
+  isAuthConfigured,
+  setSessionCookie,
+} from "@/lib/auth/session";
 import { isSafeRedirect } from "@/lib/utils";
 
 export async function loginAction(formData: FormData) {
@@ -16,6 +20,10 @@ export async function loginAction(formData: FormData) {
 
   if (!assertLoginRateLimit(email || "anonymous")) {
     redirect("/admin/login?error=rate-limit");
+  }
+
+  if (!isAuthConfigured()) {
+    redirect("/admin/login?error=config");
   }
 
   const user = await prisma.user.findUnique({
