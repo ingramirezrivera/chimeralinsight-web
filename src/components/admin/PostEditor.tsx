@@ -24,6 +24,11 @@ type EditorPost = {
   content: BlogContent;
 };
 
+const MAX_EDITOR_UPLOAD_BYTES = 5 * 1024 * 1024;
+const RECOMMENDED_IMAGE_BYTES = 2 * 1024 * 1024;
+const RECOMMENDED_FEATURED_WIDTH = 1600;
+const RECOMMENDED_FEATURED_HEIGHT = 900;
+
 function createBlock(type: BlogBlock["type"]): BlogBlock {
   const id = crypto.randomUUID();
 
@@ -52,10 +57,88 @@ async function uploadImage(file: File, alt = "") {
   });
 
   if (!response.ok) {
-    throw new Error("Upload failed");
+    let message = "Upload failed";
+
+    try {
+      const payload = (await response.json()) as { error?: string };
+      if (payload?.error) {
+        message = payload.error;
+      }
+    } catch {
+      if (response.status === 413) {
+        message = "Image is too large for the current server upload limit.";
+      } else if (response.status === 429) {
+        message = "Too many upload attempts. Please wait a moment and try again.";
+      }
+    }
+
+    throw new Error(message);
   }
 
   return response.json() as Promise<{ url: string; alt: string }>;
+}
+
+async function readImageDimensions(file: File) {
+  const objectUrl = URL.createObjectURL(file);
+
+  try {
+    const dimensions = await new Promise<{ width: number; height: number }>((resolve, reject) => {
+      const image = new window.Image();
+
+      image.onload = () => {
+        resolve({ width: image.width, height: image.height });
+      };
+
+      image.onerror = () => {
+        reject(new Error("Unable to read image dimensions."));
+      };
+
+      image.src = objectUrl;
+    });
+
+    return dimensions;
+  } finally {
+    URL.revokeObjectURL(objectUrl);
+  }
+}
+
+function formatBytes(value: number) {
+  if (value >= 1024 * 1024) {
+    return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  return `${Math.ceil(value / 1024)} KB`;
+}
+
+async function validateImageBeforeUpload(file: File, kind: "featured" | "content") {
+  if (file.size > MAX_EDITOR_UPLOAD_BYTES) {
+    throw new Error(
+      `This image is too large. Maximum allowed: ${formatBytes(MAX_EDITOR_UPLOAD_BYTES)}.`
+    );
+  }
+
+  const dimensions = await readImageDimensions(file);
+
+  if (kind === "featured") {
+    const ratio = dimensions.width / dimensions.height;
+    const recommendedRatio = RECOMMENDED_FEATURED_WIDTH / RECOMMENDED_FEATURED_HEIGHT;
+
+    if (Math.abs(ratio - recommendedRatio) > 0.2) {
+      return {
+        warning:
+          `Recommended cover ratio is ${RECOMMENDED_FEATURED_WIDTH}x${RECOMMENDED_FEATURED_HEIGHT}. ` +
+          `Current image is ${dimensions.width}x${dimensions.height}.`,
+      };
+    }
+  }
+
+  if (file.size > RECOMMENDED_IMAGE_BYTES) {
+    return {
+      warning: `This image will work, but we recommend keeping uploads under ${formatBytes(RECOMMENDED_IMAGE_BYTES)} for faster pages.`,
+    };
+  }
+
+  return { warning: "" };
 }
 
 function BlockEditor({
@@ -73,6 +156,8 @@ function BlockEditor({
 }) {
   const [uploading, startUpload] = useTransition();
   const [collapsed, setCollapsed] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadWarning, setUploadWarning] = useState("");
 
   function getBlockSummary(currentBlock: BlogBlock) {
     if (currentBlock.type === "paragraph") {
@@ -261,12 +346,32 @@ function BlockEditor({
                   if (!file) return;
 
                   startUpload(async () => {
-                    const uploaded = await uploadImage(file, block.alt);
-                    onChange({ ...block, src: uploaded.url });
+                    try {
+                      setUploadError("");
+                      const validation = await validateImageBeforeUpload(file, "content");
+                      setUploadWarning(validation.warning);
+                      const uploaded = await uploadImage(file, block.alt);
+                      onChange({ ...block, src: uploaded.url });
+                    } catch (error) {
+                      setUploadWarning("");
+                      setUploadError(
+                        error instanceof Error ? error.message : "Unable to upload image."
+                      );
+                    }
                   });
                 }}
               />
             </label>
+            <p className="mt-3 text-xs leading-5 text-slate-500">
+              Recommended: JPG or WEBP, under {formatBytes(RECOMMENDED_IMAGE_BYTES)}. Maximum
+              allowed: {formatBytes(MAX_EDITOR_UPLOAD_BYTES)}.
+            </p>
+            {uploadWarning ? (
+              <p className="mt-3 text-sm text-amber-700">{uploadWarning}</p>
+            ) : null}
+            {uploadError ? (
+              <p className="mt-3 text-sm text-red-700">{uploadError}</p>
+            ) : null}
             {block.src ? (
               <div className="mt-4 space-y-3">
                 <div className="relative h-40 w-28 overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm">
@@ -350,6 +455,8 @@ export default function PostEditor({
   const [featuredImageSize, setFeaturedImageSize] = useState(post.featuredImageSize);
   const [content, setContent] = useState<BlogContent>(post.content);
   const [isUploadingFeatured, startFeaturedUpload] = useTransition();
+  const [featuredUploadError, setFeaturedUploadError] = useState("");
+  const [featuredUploadWarning, setFeaturedUploadWarning] = useState("");
   const previewTitle = title || "Untitled post";
   const previewExcerpt = excerpt || "Your excerpt will appear here once you fill it in.";
   const previewDate = formatDate(
@@ -585,12 +692,35 @@ export default function PostEditor({
                     if (!file) return;
 
                     startFeaturedUpload(async () => {
-                      const uploaded = await uploadImage(file, featuredImageAlt);
-                      setFeaturedImage(uploaded.url);
+                      try {
+                        setFeaturedUploadError("");
+                        const validation = await validateImageBeforeUpload(file, "featured");
+                        setFeaturedUploadWarning(validation.warning);
+                        const uploaded = await uploadImage(file, featuredImageAlt);
+                        setFeaturedImage(uploaded.url);
+                      } catch (error) {
+                        setFeaturedUploadWarning("");
+                        setFeaturedUploadError(
+                          error instanceof Error
+                            ? error.message
+                            : "Unable to upload featured image."
+                        );
+                      }
                     });
                 }}
               />
             </label>
+            <p className="mt-3 text-xs leading-5 text-slate-500">
+              Recommended cover: JPG or WEBP, {RECOMMENDED_FEATURED_WIDTH}x
+              {RECOMMENDED_FEATURED_HEIGHT} px, under {formatBytes(RECOMMENDED_IMAGE_BYTES)}.
+              Maximum allowed: {formatBytes(MAX_EDITOR_UPLOAD_BYTES)}.
+            </p>
+            {featuredUploadWarning ? (
+              <p className="mt-3 text-sm text-amber-700">{featuredUploadWarning}</p>
+            ) : null}
+            {featuredUploadError ? (
+              <p className="mt-3 text-sm text-red-700">{featuredUploadError}</p>
+            ) : null}
             {featuredImage ? (
               <div className="mt-4 space-y-3">
                 <div className="relative h-48 w-32 overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm">

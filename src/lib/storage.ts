@@ -1,8 +1,11 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
+import sharp from "sharp";
 
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 5_242_880);
+const MAX_UPLOAD_DIMENSION = Number(process.env.MAX_UPLOAD_DIMENSION || 2200);
+const WEBP_QUALITY = Number(process.env.UPLOAD_WEBP_QUALITY || 82);
 const DEFAULT_MEDIA_ROOT = "storage/media";
 
 type ImageKind = {
@@ -67,8 +70,42 @@ function detectImageKind(buffer: Buffer): ImageKind | null {
   return null;
 }
 
+async function optimizeImage(buffer: Buffer) {
+  const pipeline = sharp(buffer, { failOn: "error" }).rotate();
+  const metadata = await pipeline.metadata();
+
+  if (!metadata.width || !metadata.height) {
+    throw new Error("Unable to read image dimensions");
+  }
+
+  const optimized = await pipeline
+    .resize({
+      width: MAX_UPLOAD_DIMENSION,
+      height: MAX_UPLOAD_DIMENSION,
+      fit: "inside",
+      withoutEnlargement: true,
+    })
+    .webp({
+      quality: WEBP_QUALITY,
+      effort: 4,
+    })
+    .toBuffer();
+
+  if (optimized.byteLength > MAX_UPLOAD_BYTES) {
+    throw new Error("Optimized image is still too large");
+  }
+
+  const optimizedMetadata = await sharp(optimized).metadata();
+
+  return {
+    body: optimized,
+    width: optimizedMetadata.width || metadata.width,
+    height: optimizedMetadata.height || metadata.height,
+  };
+}
+
 export async function saveUpload(file: File) {
-  if (file.size === 0 || file.size > MAX_UPLOAD_BYTES) {
+  if (file.size === 0) {
     throw new Error("Invalid file size");
   }
 
@@ -80,15 +117,18 @@ export async function saveUpload(file: File) {
     throw new Error("Unsupported file type");
   }
 
-  const filename = `${randomUUID()}.${imageKind.ext}`;
+  const optimized = await optimizeImage(buffer);
+  const filename = `${randomUUID()}.webp`;
   await ensureMediaDirectories();
-  await writeFile(path.join(getMediaOriginalsDir(), filename), buffer);
+  await writeFile(path.join(getMediaOriginalsDir(), filename), optimized.body);
 
   return {
     filename,
     path: `/media/${filename}`,
-    size: buffer.byteLength,
-    mimeType: imageKind.mimeType,
+    size: optimized.body.byteLength,
+    width: optimized.width,
+    height: optimized.height,
+    mimeType: "image/webp" as const,
   };
 }
 
@@ -120,5 +160,7 @@ export function getMediaStorageLayout() {
     derivativesDir: getMediaDerivativesDir(),
     tempDir: getMediaTempDir(),
     maxUploadBytes: MAX_UPLOAD_BYTES,
+    maxUploadDimension: MAX_UPLOAD_DIMENSION,
+    webpQuality: WEBP_QUALITY,
   };
 }
