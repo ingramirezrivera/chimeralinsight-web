@@ -45,9 +45,14 @@ export async function POST(request: Request) {
       url: uploaded.path,
       alt,
     });
-  } catch {
+  } catch (error) {
+    const message =
+      error instanceof Error && error.message
+        ? error.message
+        : "Unable to upload file";
+
     return NextResponse.json(
-      { error: "Unable to upload file" },
+      { error: message },
       { status: 400 }
     );
   }
