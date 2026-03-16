@@ -270,11 +270,10 @@ function BlockEditor({
             {block.src ? (
               <div className="mt-4 space-y-3">
                 <div className="relative h-40 w-28 overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm">
-                  <Image
+                  <img
                     src={block.src}
                     alt={block.alt || "Uploaded content image preview"}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <p className="text-sm text-slate-600">{block.src}</p>
@@ -595,11 +594,10 @@ export default function PostEditor({
             {featuredImage ? (
               <div className="mt-4 space-y-3">
                 <div className="relative h-48 w-32 overflow-hidden rounded-xl border border-black/5 bg-white shadow-sm">
-                  <Image
+                  <img
                     src={featuredImage}
                     alt={featuredImageAlt || "Uploaded featured image preview"}
-                    fill
-                    className="object-cover"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <p className="break-all text-sm text-slate-600">{featuredImage}</p>
@@ -746,11 +744,9 @@ export default function PostEditor({
               <div
                 className={`mx-auto mt-10 overflow-hidden rounded-[32px] border border-black/5 bg-white shadow-[0_25px_90px_-60px_rgba(15,23,42,0.4)] ${previewFeaturedImageWidthClass}`}
               >
-                <Image
+                <img
                   src={featuredImage}
                   alt={featuredImageAlt || previewTitle}
-                  width={1600}
-                  height={900}
                   className="h-auto w-full object-cover"
                 />
               </div>
