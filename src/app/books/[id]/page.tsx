@@ -172,7 +172,7 @@ export default async function BookPage({
                   className="rounded-lg bg-[var(--brand)] w-48 text-center hover:bg-[#276d71] text-white
                              font-semibold px-6 py-3 text-lg transition-colors no-underline"
                 >
-                  Book Articles
+                  Book Blog
                 </Link>
 
                 <Link

@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
+import { createPostAction } from "@/app/admin/posts/actions";
 
-export default function AdminNewPostPage() {
-  redirect("/admin/posts");
+export default async function AdminNewPostPage() {
+  await createPostAction();
 }

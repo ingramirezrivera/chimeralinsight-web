@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import AdminSessionGuard from "@/components/admin/AdminSessionGuard";
 import { SessionUser } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
 
@@ -32,6 +33,7 @@ export default function AdminShell({
           : "min-h-screen bg-[radial-gradient(circle_at_top,_rgba(47,129,133,0.18),_transparent_28%),linear-gradient(180deg,#171d20_0%,#20292d_28%,#2b3437_54%,#3b4442_100%)] text-slate-100"
       }
     >
+      <AdminSessionGuard />
       <div
         aria-hidden="true"
         className={cn(

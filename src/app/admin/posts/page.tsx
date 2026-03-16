@@ -2,7 +2,6 @@ import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
 import LogoutButton from "@/app/admin/LogoutButton";
 import {
-  createPostAction,
   deletePostAction,
   togglePostStatusAction,
 } from "@/app/admin/posts/actions";
@@ -22,14 +21,12 @@ export default async function AdminPostsPage() {
           <h2 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">Posts</h2>
         </div>
 
-        <form action={createPostAction}>
-          <button
-            type="submit"
-            className="rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#276d71]"
-          >
-            New post
-          </button>
-        </form>
+        <Link
+          href="/admin/posts/new"
+          className="rounded-full bg-[var(--brand)] px-5 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-[#276d71]"
+        >
+          New post
+        </Link>
       </section>
 
       <section className="rounded-[28px] border border-[rgba(47,129,133,0.12)] bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(241,247,245,0.94))] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.38)]">
