@@ -1,12 +1,11 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import LoginForm from "@/app/admin/login/LoginForm";
+import { isGoogleAuthConfigured } from "@/lib/auth/google";
 import { getSession } from "@/lib/auth/session";
 
 const errorMessages: Record<string, string> = {
-  invalid: "Invalid email or password.",
-  "rate-limit": "Too many attempts. Please wait before trying again.",
-  config: "Admin authentication is not configured on the server yet.",
+  config: "Google admin authentication is not configured on the server yet.",
 };
 
 export default async function AdminLoginPage({
@@ -21,6 +20,8 @@ export default async function AdminLoginPage({
   }
 
   const error = params.error ? errorMessages[params.error] : "";
+  const googleClientId = process.env.GOOGLE_CLIENT_ID?.trim() || "";
+  const authReady = isGoogleAuthConfigured();
 
   return (
     <main className="min-h-screen overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(47,129,133,0.3),_transparent_30%),linear-gradient(180deg,#ece3d4_0%,#f8f5ee_48%,#f5efe3_100%)] px-4 py-10 text-slate-950">
@@ -114,7 +115,11 @@ export default async function AdminLoginPage({
           ) : null}
 
           <div className="mt-8">
-            <LoginForm redirectTo={params.redirectTo || "/admin/dashboard"} />
+            <LoginForm
+              redirectTo={params.redirectTo || "/admin/dashboard"}
+              googleClientId={googleClientId}
+              authReady={authReady}
+            />
           </div>
         </section>
       </div>

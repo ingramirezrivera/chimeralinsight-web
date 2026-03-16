@@ -126,8 +126,6 @@ Blackmail, bioterror, deception—an electrifying terrorism thriller that merges
       },
     ],
     // NUEVO: marcar como “upcoming” y fecha de lanzamiento en diciembre
-    availability: "upcoming",
-    releaseDate: "2025-12-01",
     about: `The Weapons of War are Always Changing.
 
 In the real world, clandestine scientific research has already created UNNATURAL BORN KILLERS, super soldiers, genetically modified killing machines.

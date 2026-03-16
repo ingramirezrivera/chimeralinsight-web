@@ -3,14 +3,38 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 
 const MAX_UPLOAD_BYTES = Number(process.env.MAX_UPLOAD_BYTES || 5_242_880);
+const DEFAULT_MEDIA_ROOT = "storage/media";
 
 type ImageKind = {
   ext: "jpg" | "png" | "webp";
   mimeType: "image/jpeg" | "image/png" | "image/webp";
 };
 
-function getUploadDir() {
-  return path.resolve(process.cwd(), process.env.UPLOAD_DIR || "storage/uploads/blog");
+function getMediaRootDir() {
+  const configuredRoot =
+    process.env.MEDIA_ROOT_DIR || process.env.UPLOAD_DIR || DEFAULT_MEDIA_ROOT;
+
+  return path.resolve(process.cwd(), configuredRoot);
+}
+
+function getMediaOriginalsDir() {
+  return path.join(getMediaRootDir(), "originals");
+}
+
+function getMediaDerivativesDir() {
+  return path.join(getMediaRootDir(), "derivatives");
+}
+
+function getMediaTempDir() {
+  return path.join(getMediaRootDir(), "temp");
+}
+
+async function ensureMediaDirectories() {
+  await Promise.all([
+    mkdir(getMediaOriginalsDir(), { recursive: true }),
+    mkdir(getMediaDerivativesDir(), { recursive: true }),
+    mkdir(getMediaTempDir(), { recursive: true }),
+  ]);
 }
 
 function detectImageKind(buffer: Buffer): ImageKind | null {
@@ -57,9 +81,8 @@ export async function saveUpload(file: File) {
   }
 
   const filename = `${randomUUID()}.${imageKind.ext}`;
-  const uploadDir = getUploadDir();
-  await mkdir(uploadDir, { recursive: true });
-  await writeFile(path.join(uploadDir, filename), buffer);
+  await ensureMediaDirectories();
+  await writeFile(path.join(getMediaOriginalsDir(), filename), buffer);
 
   return {
     filename,
@@ -74,7 +97,7 @@ export async function readUploadedFile(filename: string) {
     return null;
   }
 
-  const absolutePath = path.join(getUploadDir(), filename);
+  const absolutePath = path.join(getMediaOriginalsDir(), filename);
 
   try {
     const file = await readFile(absolutePath);
@@ -88,4 +111,14 @@ export async function readUploadedFile(filename: string) {
   } catch {
     return null;
   }
+}
+
+export function getMediaStorageLayout() {
+  return {
+    rootDir: getMediaRootDir(),
+    originalsDir: getMediaOriginalsDir(),
+    derivativesDir: getMediaDerivativesDir(),
+    tempDir: getMediaTempDir(),
+    maxUploadBytes: MAX_UPLOAD_BYTES,
+  };
 }

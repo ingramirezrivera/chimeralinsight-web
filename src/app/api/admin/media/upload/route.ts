@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getSession } from "@/lib/auth/session";
+import { assertUploadRateLimit } from "@/lib/security/upload-rate-limit";
 import { saveUpload } from "@/lib/storage";
 
 export async function POST(request: Request) {
@@ -11,6 +12,14 @@ export async function POST(request: Request) {
   }
 
   try {
+    const forwardedFor = request.headers.get("x-forwarded-for") || "";
+    const clientIp = forwardedFor.split(",")[0]?.trim() || "unknown";
+    const rateLimitKey = `${session.userId}:${clientIp}`;
+
+    if (!assertUploadRateLimit(rateLimitKey)) {
+      return NextResponse.json({ error: "Too many upload attempts" }, { status: 429 });
+    }
+
     const formData = await request.formData();
     const file = formData.get("file");
     const alt = String(formData.get("alt") || "");

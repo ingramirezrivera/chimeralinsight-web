@@ -59,8 +59,8 @@ function CTA({
     variant === "primary"
       ? "bg-gray-900 text-white hover:bg-gray-800 focus:ring-gray-600"
       : variant === "secondary"
-      ? "bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-500"
-      : "";
+        ? "bg-gray-700 text-white hover:bg-gray-600 focus:ring-gray-500"
+        : "";
   const disabledClasses = isDisabled
     ? "pointer-events-none opacity-60 cursor-not-allowed"
     : "";
@@ -180,7 +180,7 @@ export default function BooksSection({
   items,
   id = "books",
   className = "",
-  buyLabel = "Buy on Amazon",
+  buyLabel = "Buy",
   learnMoreLabel = "Learn More …",
   background = "teal",
 }: BooksSectionProps) {
@@ -206,12 +206,12 @@ export default function BooksSection({
             const hasRetailers = retailers.length > 0;
 
             const upcoming = isUpcoming(b.availability);
-            const dynamicBuyLabel = upcoming
-              ? formatMonthYearAbbrev(b.releaseDate)
-              : buyLabel;
+            const dynamicBuyLabel = buyLabel;
 
             // upcoming → /launch/[id]/ ; otherwise Amazon/modal
-            const ctaHref = upcoming ? `/launch/${b.id}/` : b.amazonUrl ?? "#";
+            const ctaHref = upcoming
+              ? `/launch/${b.id}/`
+              : (b.amazonUrl ?? "#");
 
             const ctaAria = upcoming
               ? `View ${b.title} pre-launch`

@@ -11,8 +11,8 @@ export type SessionUser = {
   exp: number;
 };
 
-const SESSION_COOKIE = "ci_admin_session";
-const ONE_WEEK_SECONDS = 60 * 60 * 24 * 7;
+export const SESSION_COOKIE = "ci_admin_session";
+const SESSION_TTL_SECONDS = 60 * 60 * 12;
 
 function getAuthSecretValue() {
   const secret = process.env.AUTH_SECRET?.trim();
@@ -47,13 +47,22 @@ export function isAuthConfigured() {
 export function createSessionToken(payload: Omit<SessionUser, "exp">) {
   const fullPayload: SessionUser = {
     ...payload,
-    exp: Math.floor(Date.now() / 1000) + ONE_WEEK_SECONDS,
+    exp: Math.floor(Date.now() / 1000) + SESSION_TTL_SECONDS,
   };
 
   const encodedPayload = encodePayload(fullPayload);
   const signature = signPayload(encodedPayload);
 
   return `${encodedPayload}.${signature}`;
+}
+
+export function createSessionCookieOptions() {
+  return {
+    httpOnly: true,
+    sameSite: "lax" as const,
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+  };
 }
 
 export function parseSessionToken(token: string | undefined) {
@@ -93,22 +102,13 @@ export function parseSessionToken(token: string | undefined) {
 
 export async function setSessionCookie(payload: Omit<SessionUser, "exp">) {
   const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE, createSessionToken(payload), {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: ONE_WEEK_SECONDS,
-  });
+  cookieStore.set(SESSION_COOKIE, createSessionToken(payload), createSessionCookieOptions());
 }
 
 export async function clearSessionCookie() {
   const cookieStore = await cookies();
   cookieStore.set(SESSION_COOKIE, "", {
-    httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
+    ...createSessionCookieOptions(),
     maxAge: 0,
   });
 }

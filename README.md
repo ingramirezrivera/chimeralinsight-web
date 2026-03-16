@@ -91,7 +91,11 @@ docs/
 npm run dev
 npm run build
 npm run start
+npm run start:production
 npm run lint
+npm run prisma:deploy
+npm run admin:bootstrap
+npm run env:check:production
 ```
 
 ## Variables de entorno
@@ -107,7 +111,7 @@ MAILERLITE_API_KEY=
 MAILERLITE_GROUP_ID_BLOG=
 MAILERLITE_GROUP_ID_WHIPTHEDOGS=
 RECAPTCHA_SECRET_KEY=
-UPLOAD_DIR=
+MEDIA_ROOT_DIR=
 MAX_UPLOAD_BYTES=
 ```
 
