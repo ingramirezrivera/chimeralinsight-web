@@ -9,8 +9,8 @@ const WEBP_QUALITY = Number(process.env.UPLOAD_WEBP_QUALITY || 82);
 const DEFAULT_MEDIA_ROOT = "storage/media";
 
 type ImageKind = {
-  ext: "jpg" | "png" | "webp";
-  mimeType: "image/jpeg" | "image/png" | "image/webp";
+  ext: "jpg" | "png" | "webp" | "gif";
+  mimeType: "image/jpeg" | "image/png" | "image/webp" | "image/gif";
 };
 
 function getMediaRootDir() {
@@ -67,6 +67,15 @@ function detectImageKind(buffer: Buffer): ImageKind | null {
     return { ext: "webp", mimeType: "image/webp" };
   }
 
+  if (
+    buffer[0] === 0x47 &&
+    buffer[1] === 0x49 &&
+    buffer[2] === 0x46 &&
+    buffer[3] === 0x38
+  ) {
+    return { ext: "gif", mimeType: "image/gif" };
+  }
+
   return null;
 }
 
@@ -104,13 +113,10 @@ async function optimizeImage(buffer: Buffer) {
   };
 }
 
-export async function saveUpload(file: File) {
-  if (file.size === 0) {
+export async function saveUploadBuffer(buffer: Buffer) {
+  if (buffer.byteLength === 0) {
     throw new Error("Invalid file size");
   }
-
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
   const imageKind = detectImageKind(buffer);
 
   if (!imageKind) {
@@ -132,8 +138,17 @@ export async function saveUpload(file: File) {
   };
 }
 
+export async function saveUpload(file: File) {
+  if (file.size === 0) {
+    throw new Error("Invalid file size");
+  }
+
+  const arrayBuffer = await file.arrayBuffer();
+  return saveUploadBuffer(Buffer.from(arrayBuffer));
+}
+
 export async function readUploadedFile(filename: string) {
-  if (!/^[a-z0-9-]+\.(jpg|png|webp)$/i.test(filename)) {
+  if (!/^[a-z0-9-]+\.(jpg|png|webp|gif)$/i.test(filename)) {
     return null;
   }
 

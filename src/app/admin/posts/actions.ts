@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createEmptyContent } from "@/lib/blog/content";
 import { requireRole } from "@/lib/auth/session";
 import { prisma } from "@/lib/db";
+import { makeSlug } from "@/lib/utils";
 import { blogContentSchema, postInputSchema } from "@/lib/validations/blog";
 
 type PostStatusValue = "DRAFT" | "PUBLISHED";
@@ -17,6 +18,26 @@ function getPublishedAt(status: PostStatusValue, rawPublishedAt: string) {
   if (status !== "PUBLISHED") return null;
   if (!rawPublishedAt) return new Date();
   return new Date(rawPublishedAt);
+}
+
+async function resolveUniqueSlug(rawSlug: string, postId?: string) {
+  const baseSlug = makeSlug(rawSlug) || `draft-${Date.now()}`;
+  let candidateSlug = baseSlug;
+  let suffix = 2;
+
+  while (true) {
+    const existingPost = await prisma.post.findUnique({
+      where: { slug: candidateSlug },
+      select: { id: true },
+    });
+
+    if (!existingPost || existingPost.id === postId) {
+      return candidateSlug;
+    }
+
+    candidateSlug = `${baseSlug}-${suffix}`;
+    suffix += 1;
+  }
 }
 
 export async function createPostAction() {
@@ -67,10 +88,11 @@ export async function savePostAction(formData: FormData) {
     featuredImageSize,
   });
   const status: PostStatusValue = parsed.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+  const resolvedSlug = await resolveUniqueSlug(parsed.slug, postId || undefined);
 
   const payload = {
     title: parsed.title,
-    slug: parsed.slug,
+    slug: resolvedSlug,
     excerpt: normalizeOptional(parsed.excerpt),
     featuredImage: normalizeOptional(parsed.featuredImage),
     featuredImageAlt: normalizeOptional(parsed.featuredImageAlt),
@@ -95,7 +117,7 @@ export async function savePostAction(formData: FormData) {
   revalidatePath("/admin/posts");
 
   if (postId) {
-    revalidatePath(`/blog/${parsed.slug}`);
+    revalidatePath(`/blog/${resolvedSlug}`);
     redirect(`/admin/posts/${postId}/edit?saved=1`);
   }
 

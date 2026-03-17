@@ -41,6 +41,11 @@ export function renderInlineMarkup(value: string) {
       (_, label: string, href: string) =>
         `<a href="${sanitizeHref(href)}" rel="noreferrer noopener">${escapeHtml(label)}</a>`
     )
+    .replace(
+      /==([^=]+)==/g,
+      '<mark class="rounded-[0.35em] bg-[#efe3a4] px-[0.18em] py-[0.08em] text-inherit">$1</mark>'
+    )
+    .replace(/\+\+([^+]+)\+\+/g, "<u>$1</u>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>");
 }
