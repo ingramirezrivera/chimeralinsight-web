@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { books, getBookById } from "@/data/books";
 import BlogContentRenderer from "@/components/blog/BlogContentRenderer";
 import type { BlogBlock, BlogContent } from "@/lib/blog/types";
@@ -28,6 +28,19 @@ const MAX_EDITOR_UPLOAD_BYTES = 5 * 1024 * 1024;
 const RECOMMENDED_IMAGE_BYTES = 2 * 1024 * 1024;
 const RECOMMENDED_FEATURED_WIDTH = 1600;
 const RECOMMENDED_FEATURED_HEIGHT = 900;
+const MAX_DOCX_IMPORT_BYTES = 15 * 1024 * 1024;
+
+type ImportedDocxDraft = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  seoTitle: string;
+  seoDescription: string;
+  featuredImage: string;
+  featuredImageAlt: string;
+  content: BlogContent;
+  warnings: string[];
+};
 
 function createBlock(type: BlogBlock["type"]): BlogBlock {
   const id = crypto.randomUUID();
@@ -78,6 +91,37 @@ async function uploadImage(file: File, alt = "") {
   return response.json() as Promise<{ url: string; alt: string }>;
 }
 
+async function importDocx(file: File) {
+  const body = new FormData();
+  body.append("file", file);
+
+  const response = await fetch("/api/admin/posts/import-docx", {
+    method: "POST",
+    body,
+  });
+
+  if (!response.ok) {
+    let message = "Unable to import the Word document.";
+
+    try {
+      const payload = (await response.json()) as { error?: string };
+      if (payload?.error) {
+        message = payload.error;
+      }
+    } catch {
+      if (response.status === 413) {
+        message = "The Word document is too large for the current server upload limit.";
+      } else if (response.status === 429) {
+        message = "Too many import attempts. Please wait a moment and try again.";
+      }
+    }
+
+    throw new Error(message);
+  }
+
+  return response.json() as Promise<ImportedDocxDraft>;
+}
+
 async function readImageDimensions(file: File) {
   const objectUrl = URL.createObjectURL(file);
 
@@ -108,6 +152,20 @@ function formatBytes(value: number) {
   }
 
   return `${Math.ceil(value / 1024)} KB`;
+}
+
+function hasMeaningfulContent(content: BlogContent) {
+  return content.blocks.some((block) => {
+    if (block.type === "paragraph" || block.type === "heading" || block.type === "quote") {
+      return block.text.trim().length > 0;
+    }
+
+    if (block.type === "list") {
+      return block.items.some((item) => item.trim().length > 0);
+    }
+
+    return Boolean(block.src.trim() || block.alt.trim() || (block.caption || "").trim());
+  });
 }
 
 async function validateImageBeforeUpload(file: File, kind: "featured" | "content") {
@@ -249,7 +307,7 @@ function BlockEditor({
           value={block.text}
           onChange={(event) => onChange({ ...block, text: event.target.value })}
           className="input min-h-32"
-          placeholder="Paragraph text. Supports **bold**, *italic*, and [links](https://example.com)."
+          placeholder="Paragraph text. Supports **bold**, *italic*, ++underline++, ==highlight==, and [links](https://example.com)."
         />
       ) : null}
 
@@ -447,16 +505,22 @@ export default function PostEditor({
   post: EditorPost;
   action: (formData: FormData) => void;
 }) {
+  const importInputRef = useRef<HTMLInputElement | null>(null);
   const [title, setTitle] = useState(post.title);
   const [slug, setSlug] = useState(post.slug);
   const [excerpt, setExcerpt] = useState(post.excerpt);
   const [featuredImage, setFeaturedImage] = useState(post.featuredImage);
   const [featuredImageAlt, setFeaturedImageAlt] = useState(post.featuredImageAlt);
   const [featuredImageSize, setFeaturedImageSize] = useState(post.featuredImageSize);
+  const [seoTitle, setSeoTitle] = useState(post.seoTitle);
+  const [seoDescription, setSeoDescription] = useState(post.seoDescription);
   const [content, setContent] = useState<BlogContent>(post.content);
   const [isUploadingFeatured, startFeaturedUpload] = useTransition();
+  const [isImportingDocx, startDocxImport] = useTransition();
   const [featuredUploadError, setFeaturedUploadError] = useState("");
   const [featuredUploadWarning, setFeaturedUploadWarning] = useState("");
+  const [docxImportError, setDocxImportError] = useState("");
+  const [docxImportSuccess, setDocxImportSuccess] = useState("");
   const previewTitle = title || "Untitled post";
   const previewExcerpt = excerpt || "Your excerpt will appear here once you fill it in.";
   const previewDate = formatDate(
@@ -497,6 +561,38 @@ export default function PostEditor({
     }));
   }
 
+  function shouldConfirmImport() {
+    return (
+      title.trim() !== "" ||
+      excerpt.trim() !== "" ||
+      featuredImage.trim() !== "" ||
+      featuredImageAlt.trim() !== "" ||
+      seoTitle.trim() !== "" ||
+      seoDescription.trim() !== "" ||
+      hasMeaningfulContent(content)
+    );
+  }
+
+  function applyImportedDraft(imported: ImportedDocxDraft) {
+    setTitle(imported.title);
+    setSlug(imported.slug);
+    setExcerpt(imported.excerpt);
+    setFeaturedImage(imported.featuredImage);
+    setFeaturedImageAlt(imported.featuredImageAlt);
+    setFeaturedImageSize(imported.featuredImage ? "large" : "small");
+    setSeoTitle(imported.seoTitle);
+    setSeoDescription(imported.seoDescription);
+    setContent(imported.content);
+    setFeaturedUploadError("");
+    setFeaturedUploadWarning("");
+    setDocxImportError("");
+    setDocxImportSuccess(
+      imported.warnings.length
+        ? `Imported draft with ${imported.warnings.length} note${imported.warnings.length === 1 ? "" : "s"} from the Word conversion.`
+        : "Word draft imported successfully. You can keep editing block by block."
+    );
+  }
+
   return (
     <form action={action} className="space-y-8">
       <button
@@ -516,6 +612,88 @@ export default function PostEditor({
         <div className="space-y-6">
           <section className="rounded-[28px] border border-[rgba(47,129,133,0.12)] bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(241,247,245,0.94))] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.18)]">
             <div className="space-y-5">
+              <div className="rounded-[24px] border border-[rgba(47,129,133,0.12)] bg-[rgba(47,129,133,0.04)] p-4">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div className="max-w-2xl">
+                    <p className="text-xs uppercase tracking-[0.16em] text-[var(--brand)]">
+                      Import from Word
+                    </p>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      Upload a `.docx` file and we will draft the title, slug, excerpt, SEO copy,
+                      article blocks, and embedded images automatically. Robin can still refine
+                      everything manually afterwards.
+                    </p>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      Recommended: clean Word headings, short paragraphs, and a file under{" "}
+                      {formatBytes(MAX_DOCX_IMPORT_BYTES)}.
+                    </p>
+                  </div>
+                  <div className="shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => importInputRef.current?.click()}
+                      className="inline-flex h-12 items-center justify-center rounded-full bg-slate-900 px-5 text-xs font-semibold uppercase tracking-[0.14em] text-white transition hover:bg-slate-800"
+                    >
+                      {isImportingDocx ? "Importing..." : "Import .docx"}
+                    </button>
+                    <input
+                      ref={importInputRef}
+                      type="file"
+                      accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                      className="sr-only"
+                      onChange={(event) => {
+                        const file = event.target.files?.[0];
+                        event.target.value = "";
+
+                        if (!file) return;
+
+                        startDocxImport(async () => {
+                          try {
+                            setDocxImportError("");
+                            setDocxImportSuccess("");
+
+                            if (!file.name.toLowerCase().endsWith(".docx")) {
+                              throw new Error("Please choose a .docx file.");
+                            }
+
+                            if (file.size > MAX_DOCX_IMPORT_BYTES) {
+                              throw new Error(
+                                `This document is too large. Maximum recommended size: ${formatBytes(MAX_DOCX_IMPORT_BYTES)}.`
+                              );
+                            }
+
+                            if (
+                              shouldConfirmImport() &&
+                              !window.confirm(
+                                "This will replace the current draft fields with the imported Word content. Continue?"
+                              )
+                            ) {
+                              return;
+                            }
+
+                            const imported = await importDocx(file);
+                            applyImportedDraft(imported);
+                          } catch (error) {
+                            setDocxImportSuccess("");
+                            setDocxImportError(
+                              error instanceof Error
+                                ? error.message
+                                : "Unable to import the Word document."
+                            );
+                          }
+                        });
+                      }}
+                    />
+                  </div>
+                </div>
+                {docxImportSuccess ? (
+                  <p className="mt-3 text-sm text-emerald-700">{docxImportSuccess}</p>
+                ) : null}
+                {docxImportError ? (
+                  <p className="mt-3 text-sm text-red-700">{docxImportError}</p>
+                ) : null}
+              </div>
+
               <div className="space-y-2">
                 <label htmlFor="title" className="text-sm font-medium text-slate-700">
                   Title
@@ -778,7 +956,8 @@ export default function PostEditor({
                 <input
                   id="seoTitle"
                   name="seoTitle"
-                  defaultValue={post.seoTitle}
+                  value={seoTitle}
+                  onChange={(event) => setSeoTitle(event.target.value)}
                   className="input h-12 text-slate-900"
                   placeholder="Custom search title"
                 />
@@ -790,7 +969,8 @@ export default function PostEditor({
                 <textarea
                   id="seoDescription"
                   name="seoDescription"
-                  defaultValue={post.seoDescription}
+                  value={seoDescription}
+                  onChange={(event) => setSeoDescription(event.target.value)}
                   className="input min-h-24 text-slate-900"
                   placeholder="Search and social description"
                 />

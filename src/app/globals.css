@@ -88,7 +88,14 @@
   }
 
   ::selection {
-    background: rgba(var(--brand-rgb), 0.25);
+    background: rgba(var(--brand-rgb), 0.35);
+    color: #0f172a;
+  }
+
+  input::selection,
+  textarea::selection {
+    background: rgba(148, 163, 184, 0.45);
+    color: #0f172a;
   }
   :focus-visible {
     outline: none;
