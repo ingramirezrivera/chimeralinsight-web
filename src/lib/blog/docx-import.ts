@@ -44,6 +44,18 @@ function createId() {
   return crypto.randomUUID();
 }
 
+function getMammothImageAltText(image: unknown) {
+  if (!image || typeof image !== "object") {
+    return "";
+  }
+
+  if ("altText" in image && typeof image.altText === "string") {
+    return image.altText;
+  }
+
+  return "";
+}
+
 function asElement(node: unknown) {
   if (!node || typeof node !== "object") return null;
   if (!("tagName" in node)) return null;
@@ -323,16 +335,18 @@ export async function importDocxToDraft(
     { buffer },
     {
       convertImage: mammoth.images.imgElement(async (image) => {
+        const altText = getMammothImageAltText(image);
+
         try {
           const base64 = await image.read("base64");
-          const uploaded = await importImage(Buffer.from(base64, "base64"), image.altText || "");
+          const uploaded = await importImage(Buffer.from(base64, "base64"), altText);
 
           return {
             src: uploaded.url,
             alt: uploaded.alt,
           };
         } catch (error) {
-          const imageLabel = image.altText || image.contentType || "embedded image";
+          const imageLabel = altText || image.contentType || "embedded image";
           const reason =
             error instanceof Error && error.message ? error.message : "conversion failed";
 
@@ -340,7 +354,7 @@ export async function importDocxToDraft(
 
           return {
             src: "",
-            alt: image.altText || "",
+            alt: altText,
           };
         }
       }),
