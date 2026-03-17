@@ -11,14 +11,14 @@ import { getSiteUrl } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Editorial essays, updates and author reflections from Chimeral Insight.",
+    "In-depth essays exploring biological warfare, global risks, and the systems shaping humanity's next era.",
   alternates: {
     canonical: `${getSiteUrl()}/blog`,
   },
   openGraph: {
     title: "Chimeral Insight Blog",
     description:
-      "Editorial essays, updates and author reflections from Chimeral Insight.",
+      "In-depth essays exploring biological warfare, global risks, and the systems shaping humanity's next era.",
     url: `${getSiteUrl()}/blog`,
     type: "website",
   },
@@ -58,11 +58,11 @@ export default async function BlogIndexPage({
               Chimeral Insight Journal
             </p>
             <h1 className="text-5xl font-semibold leading-tight tracking-tight lg:text-7xl">
-              Thoughtful essays, author notes and carefully paced publishing.
+              Where biology, power, and the future converge.
             </h1>
             <p className="max-w-2xl text-lg leading-8 text-slate-600">
-              A premium editorial space built for discoverability, clarity and
-              calm reading across desktop and mobile.
+              In-depth essays exploring biological warfare, global risks, and
+              the systems shaping humanity&apos;s next era.
             </p>
             {selectedBook ? (
               <div className="inline-flex items-center gap-3 rounded-full border border-[rgba(47,129,133,0.12)] bg-white/80 px-5 py-3 text-sm text-slate-700 shadow-[0_18px_40px_-32px_rgba(15,23,42,0.28)]">
