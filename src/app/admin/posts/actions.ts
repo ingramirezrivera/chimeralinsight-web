@@ -59,6 +59,7 @@ export async function createPostAction() {
 export async function savePostAction(formData: FormData) {
   const session = await requireRole(["ADMIN", "EDITOR"]);
   const postId = String(formData.get("postId") || "");
+  const intent = String(formData.get("intent") || "save");
 
   const parsed = postInputSchema.parse({
     title: formData.get("title"),
@@ -87,7 +88,8 @@ export async function savePostAction(formData: FormData) {
     ...JSON.parse(parsed.content),
     featuredImageSize,
   });
-  const status: PostStatusValue = parsed.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+  const status: PostStatusValue =
+    intent === "publish" || parsed.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
   const resolvedSlug = await resolveUniqueSlug(parsed.slug, postId || undefined);
 
   const payload = {
@@ -118,7 +120,9 @@ export async function savePostAction(formData: FormData) {
 
   if (postId) {
     revalidatePath(`/blog/${resolvedSlug}`);
-    redirect(`/admin/posts/${postId}/edit?saved=1`);
+    redirect(
+      `/admin/posts/${postId}/edit?saved=${status === "PUBLISHED" ? "published" : "draft"}`
+    );
   }
 
   redirect("/admin/posts");

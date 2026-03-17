@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { books, getBookById } from "@/data/books";
 import BlogContentRenderer from "@/components/blog/BlogContentRenderer";
@@ -501,9 +502,11 @@ function BlockEditor({
 export default function PostEditor({
   post,
   action,
+  savedState,
 }: {
   post: EditorPost;
   action: (formData: FormData) => void;
+  savedState?: "draft" | "published" | null;
 }) {
   const importInputRef = useRef<HTMLInputElement | null>(null);
   const [title, setTitle] = useState(post.title);
@@ -512,6 +515,7 @@ export default function PostEditor({
   const [featuredImage, setFeaturedImage] = useState(post.featuredImage);
   const [featuredImageAlt, setFeaturedImageAlt] = useState(post.featuredImageAlt);
   const [featuredImageSize, setFeaturedImageSize] = useState(post.featuredImageSize);
+  const [status, setStatus] = useState<"DRAFT" | "PUBLISHED">(post.status);
   const [seoTitle, setSeoTitle] = useState(post.seoTitle);
   const [seoDescription, setSeoDescription] = useState(post.seoDescription);
   const [content, setContent] = useState<BlogContent>(post.content);
@@ -527,6 +531,12 @@ export default function PostEditor({
     post.publishedAt ? new Date(post.publishedAt) : new Date()
   );
   const relatedBook = getBookById(content.relatedBookId);
+  const primarySubmitLabel =
+    status === "PUBLISHED"
+      ? post.status === "PUBLISHED"
+        ? "Update published post"
+        : "Publish post"
+      : "Save draft";
   const previewFeaturedImageWidthClass =
     featuredImageSize === "small"
       ? "max-w-[26rem]"
@@ -597,9 +607,11 @@ export default function PostEditor({
     <form action={action} className="space-y-8">
       <button
         type="submit"
+        name="intent"
+        value="save"
         className="fixed bottom-6 right-6 z-40 inline-flex h-14 items-center justify-center rounded-full bg-[var(--brand)] px-6 text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-[0_20px_50px_-20px_rgba(47,129,133,0.9)] transition hover:bg-[#276d71]"
       >
-        Save post
+        {primarySubmitLabel}
       </button>
 
       <input type="hidden" name="postId" value={post.id || ""} />
@@ -610,6 +622,30 @@ export default function PostEditor({
 
       <div className="grid gap-8 xl:grid-cols-[minmax(0,1.3fr)_380px]">
         <div className="space-y-6">
+          {savedState ? (
+            <section className="rounded-[24px] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-900 shadow-[0_18px_50px_-36px_rgba(16,185,129,0.28)]">
+              <p className="font-semibold uppercase tracking-[0.14em] text-emerald-700">
+                {savedState === "published" ? "Published" : "Draft saved"}
+              </p>
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 leading-6">
+                <span>
+                  {savedState === "published"
+                    ? "Your article is live and the latest changes were saved."
+                    : "Your changes were saved to drafts. You can keep editing or publish when ready."}
+                </span>
+                {savedState === "published" ? (
+                  <Link href={`/blog/${slug}`} className="font-semibold text-emerald-700 underline">
+                    View live post
+                  </Link>
+                ) : (
+                  <Link href="/admin/posts" className="font-semibold text-emerald-700 underline">
+                    Back to posts
+                  </Link>
+                )}
+              </div>
+            </section>
+          ) : null}
+
           <section className="rounded-[28px] border border-[rgba(47,129,133,0.12)] bg-[linear-gradient(180deg,rgba(255,255,255,0.97),rgba(241,247,245,0.94))] p-6 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.18)]">
             <div className="space-y-5">
               <div className="rounded-[24px] border border-[rgba(47,129,133,0.12)] bg-[rgba(47,129,133,0.04)] p-4">
@@ -739,7 +775,10 @@ export default function PostEditor({
                   <select
                     id="status"
                     name="status"
-                    defaultValue={post.status}
+                    value={status}
+                    onChange={(event) =>
+                      setStatus(event.target.value === "PUBLISHED" ? "PUBLISHED" : "DRAFT")
+                    }
                     className="input h-12 text-slate-900"
                   >
                     <option value="DRAFT">Draft</option>
@@ -992,10 +1031,22 @@ export default function PostEditor({
 
           <button
             type="submit"
+            name="intent"
+            value="save"
             className="inline-flex h-14 w-full items-center justify-center rounded-full bg-[var(--brand)] px-5 text-sm font-semibold uppercase tracking-[0.16em] text-white transition hover:bg-[#276d71]"
           >
-            Save post
+            {primarySubmitLabel}
           </button>
+          {status === "DRAFT" ? (
+            <button
+              type="submit"
+              name="intent"
+              value="publish"
+              className="inline-flex h-14 w-full items-center justify-center rounded-full border border-[var(--brand)] bg-white px-5 text-sm font-semibold uppercase tracking-[0.16em] text-[var(--brand)] transition hover:bg-[rgba(47,129,133,0.06)]"
+            >
+              Publish now
+            </button>
+          ) : null}
         </aside>
       </div>
 

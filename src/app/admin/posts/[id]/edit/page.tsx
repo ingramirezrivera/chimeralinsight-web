@@ -17,11 +17,14 @@ function toDateTimeLocal(value: Date | null) {
 
 export default async function AdminEditPostPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams?: Promise<{ saved?: string }>;
 }) {
   const session = await requireRole(["ADMIN", "EDITOR"]);
   const { id } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const post = await getPostById(id);
 
   if (!post) {
@@ -37,6 +40,13 @@ export default async function AdminEditPostPage({
 
       <PostEditor
         action={savePostAction}
+        savedState={
+          resolvedSearchParams?.saved === "published"
+            ? "published"
+            : resolvedSearchParams?.saved === "draft"
+              ? "draft"
+              : null
+        }
         post={{
           id: post.id,
           title: post.title,
